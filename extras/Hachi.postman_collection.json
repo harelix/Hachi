@@ -1,0 +1,140 @@
+{
+	"info": {
+		"_postman_id": "6a60fa08-f442-4ae0-8abe-036ee8d3d57e",
+		"name": "Hachi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "apc",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "hachi-x-author",
+						"value": "relix",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authz",
+						"value": "root",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authn",
+						"value": "234h97sydfy3o458hy3453y",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"speak\" : \"Say hello to the rug's topography It holds quite a lot of interest with your face down on it\",\r\n    \"language\" : \"en-US\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3007/api/v1/cns/brain/frontal/region/broca",
+					"host": [
+						"localhost"
+					],
+					"port": "3007",
+					"path": [
+						"api",
+						"v1",
+						"cns",
+						"brain",
+						"frontal",
+						"region",
+						"broca"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "wb_pt",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "hachi-x-author",
+						"value": "relix",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authz",
+						"value": "root",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authn",
+						"value": "234h97sydfy3o458hy3453y",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"speak\" : \"I was angry with my friend; I told my wrath, my wrath did end. I was angry with my foe: I told it not, my wrath did grow. \",\r\n    \"language\" : \"english\",\r\n    \"author\" : \"William Blake\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3007/api/v1/cns/brain/frontal/region/broca",
+					"host": [
+						"localhost"
+					],
+					"port": "3007",
+					"path": [
+						"api",
+						"v1",
+						"cns",
+						"brain",
+						"frontal",
+						"region",
+						"broca"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request xml",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"speak\" : \"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<AuthContext version=\"1.0\"><Request authIdentifier=\"0\">\r\n<Login orgName=\"dc=red,dc=iplanet,dc=com\">\r\n<IndexTypeNamePair indexType=\"moduleInstance\"><IndexName>LDAP</IndexName>\r\n</IndexTypeNamePair></Login></Request></AuthContext>\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3007/api/v1/cns/brain/frontal/region/broca",
+					"host": [
+						"localhost"
+					],
+					"port": "3007",
+					"path": [
+						"api",
+						"v1",
+						"cns",
+						"brain",
+						"frontal",
+						"region",
+						"broca"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,11 @@
+{
+  "ack_policy": "explicit",
+  "ack_wait": 30000000000,
+  "deliver_policy": "new",
+  "durable_name": "CNS",
+  "max_ack_pending": 20000,
+  "max_deliver": -1,
+  "max_waiting": 512,
+  "replay_policy": "instant",
+  "sample_freq": "100"
+}

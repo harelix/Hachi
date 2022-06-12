@@ -1,0 +1,2 @@
+
+What streams are we creating, are they dynamic or fixed?

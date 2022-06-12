@@ -1,0 +1,5 @@
+package interpolator
+
+func Interpolate() {
+
+}
