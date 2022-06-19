@@ -1,4 +1,4 @@
-module github.com/gilbarco-ai/Hachi
+module github.com/rills-ai/Hachi
 
 go 1.18
 

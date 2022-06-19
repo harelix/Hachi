@@ -9,9 +9,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gilbarco-ai/Hachi/pkg/helper"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
+	"github.com/rills-ai/Hachi/pkg/helper"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -41,8 +41,10 @@ func (at DNATypes) String() string {
 type HachiConfig struct {
 	IAM                    IAgent
 	Service                Service
+	Internals              ServiceInternals
 	Values                 ValuesConfig
 	rawConfigValue         []byte
+	internalTractsConfig   []byte
 	rawValues              []byte
 	interpolatedConfigFile []byte
 	ValuesFile             []byte
@@ -54,6 +56,15 @@ type Service struct {
 	DNA     DNAConfig `hcl:"dna,block"`
 }
 
+type ServiceInternals struct {
+	DNA InternalDNA `hcl:"dna,block"`
+}
+
+type InternalDNA struct {
+	Name   string       `hcl:"name,label"`
+	Tracts TractsConfig `hcl:"tracts,block"`
+}
+
 func New() *HachiConfig {
 	once.Do(func() {
 		instantiated = &HachiConfig{}
@@ -62,17 +73,18 @@ func New() *HachiConfig {
 }
 
 type DNAConfig struct {
-	Name       string           `hcl:"name,label"`
-	API        APIConfig        `hcl:"api,block"`
-	Controller controllerConfig `hcl:"controller,block"`
-	Agent      agentConfig      `hcl:"agent,block"`
-	Storage    StorageConfig    `hcl:"storage,block"`
-	Tracts     TractsConfig     `hcl:"tracts,block"`
-	Stream     StreamConfig     `hcl:"stream,block"`
-	HRL        HRLConfig        `hcl:"hrl,block"`
-	Nats       NatsConfig       `hcl:"nats,block"`
-	KV         KVConfig         `hcl:"kv_db,block"`
-	Http       ServerConfig     `hcl:"http,block"`
+	Name           string           `hcl:"name,label"`
+	API            APIConfig        `hcl:"api,block"`
+	Controller     controllerConfig `hcl:"controller,block"`
+	Agent          agentConfig      `hcl:"agent,block"`
+	Storage        StorageConfig    `hcl:"storage,block"`
+	Tracts         TractsConfig     `hcl:"tracts,block"`
+	Stream         StreamConfig     `hcl:"stream,block"`
+	HRL            HRLConfig        `hcl:"hrl,block"`
+	Nats           NatsConfig       `hcl:"nats,block"`
+	KV             KVConfig         `hcl:"kv_db,block"`
+	Http           ServerConfig     `hcl:"http,block"`
+	InternalTracts TractsConfig
 }
 
 type ValuesConfig struct {
@@ -211,7 +223,12 @@ type DedupingConfig struct {
 	Strategy string `hcl:"strategy"`
 }
 
+func (config *HachiConfig) AppendInternalsToConfigFile() {
+	config.Service.DNA.Tracts.Streams = append(config.Service.DNA.Tracts.Streams, config.Internals.DNA.Tracts.Streams...)
+}
+
 func (config *HachiConfig) ParseFile(filePath string) error {
+
 	var err error
 	ctx := &hcl.EvalContext{
 		Variables: map[string]cty.Value{
@@ -219,22 +236,41 @@ func (config *HachiConfig) ParseFile(filePath string) error {
 		},
 	}
 
+	//main configuration file parsing
 	config.rawConfigValue, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to read file: %w", err)
 	}
-
-	c, err := config.InterpolateStrings()
+	baseConfigContent := string(config.rawConfigValue)
+	bc, err := config.InterpolateStrings(baseConfigContent)
 	if err != nil {
 		return fmt.Errorf("failed to interpolate config: %w", err)
 	}
 
-	config.interpolatedConfigFile = []byte(c)
+	//itnernal configuration file parsing
+	config.internalTractsConfig, err = ioutil.ReadFile("conf.d/internals/internals.hcl")
+	if err != nil {
+		return fmt.Errorf("failed to read file: %w", err)
+	}
+	internalConfigContent := string(config.internalTractsConfig)
+	ic, err := config.InterpolateStrings(internalConfigContent)
+	if err != nil {
+		return fmt.Errorf("failed to interpolate config: %w", err)
+	}
+
+	config.interpolatedConfigFile = []byte(bc)
 	err = hclsimple.Decode(filePath, config.interpolatedConfigFile, ctx, &config.Service)
 	if err != nil {
 		return fmt.Errorf("failed to parse HCL file: %w", err)
 	}
 
+	tempString := []byte(ic)
+	err = hclsimple.Decode(filePath, tempString, ctx, &config.Internals)
+	if err != nil {
+		return fmt.Errorf("failed to parse HCL file: %w", err)
+	}
+
+	config.AppendInternalsToConfigFile()
 	//if config.Service.Agent.controller.Enabled() {
 	if config.Service.DNA.Controller.Enabled {
 		config.Service.Type = Controller
@@ -262,7 +298,7 @@ func (config *HachiConfig) LoadStanzaValues(filePath string) error {
 var InterpolationRegex = regexp.MustCompile("{{\\.((local|remote|route|resolver)::(.*?))}}")
 
 // InterpolateStrings  we currently support interpolation from envars and Hachi stanza vars
-func (config *HachiConfig) InterpolateStrings() (string, error) {
+func (config *HachiConfig) InterpolateStrings(content string) (string, error) {
 	//stanza vars override envars values
 	stanza_vars := config.Values.Values
 	lstanza_vars := helper.MapKeys[string, string](stanza_vars, strings.ToLower)
@@ -277,7 +313,6 @@ func (config *HachiConfig) InterpolateStrings() (string, error) {
 		envars[strings.ToLower(before)] = after
 	}
 
-	content := string(config.rawConfigValue)
 	matches := InterpolationRegex.FindAllString(content, -1)
 	for _, v := range matches {
 		interpolatedPlaceholder := v

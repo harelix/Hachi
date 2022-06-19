@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gilbarco-ai/Hachi/pkg/api/handlers"
-	"github.com/gilbarco-ai/Hachi/pkg/config"
 	"github.com/labstack/echo/v4"
+	"github.com/rills-ai/Hachi/pkg/api/handlers"
+	"github.com/rills-ai/Hachi/pkg/config"
 	"golang.org/x/exp/slices"
 )
 
@@ -46,7 +46,8 @@ func ListAllRoutes(c echo.Context, routes []*echo.Route) error {
 // BindRoutesFromConfiguration implements register and binds all routes declared in Hachi's configuration files
 func BindRoutesFromConfiguration(group *echo.Group) error {
 
-	streams := config.New().Service.DNA.Tracts.Streams
+	internalStreams := config.New().Service.DNA.InternalTracts.Streams
+	streams := append(internalStreams, config.New().Service.DNA.Tracts.Streams...)
 
 	for _, stream := range streams {
 		path := stream.Local

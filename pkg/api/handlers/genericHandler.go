@@ -3,17 +3,17 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"github.com/gilbarco-ai/Hachi/pkg/helper"
-	"github.com/gilbarco-ai/Hachi/pkg/internal"
+	"github.com/rills-ai/Hachi/pkg/helper"
+	"github.com/rills-ai/Hachi/pkg/internal"
 	"io"
 	"net/http"
 	"strings"
 
-	HachiContext "github.com/gilbarco-ai/Hachi/pkg"
-	"github.com/gilbarco-ai/Hachi/pkg/config"
-	"github.com/gilbarco-ai/Hachi/pkg/messages"
-	"github.com/gilbarco-ai/Hachi/pkg/messaging"
 	"github.com/labstack/echo/v4"
+	HachiContext "github.com/rills-ai/Hachi/pkg"
+	"github.com/rills-ai/Hachi/pkg/config"
+	"github.com/rills-ai/Hachi/pkg/messages"
+	"github.com/rills-ai/Hachi/pkg/messaging"
 )
 
 func HachiGenericHandler(c echo.Context, route config.RouteConfig) error {

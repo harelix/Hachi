@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	HachiContext "github.com/gilbarco-ai/Hachi/pkg"
-	"github.com/gilbarco-ai/Hachi/pkg/config"
-	"github.com/gilbarco-ai/Hachi/pkg/messages"
 	"github.com/nats-io/nats.go"
+	HachiContext "github.com/rills-ai/Hachi/pkg"
+	"github.com/rills-ai/Hachi/pkg/config"
+	"github.com/rills-ai/Hachi/pkg/messages"
 	log "github.com/sirupsen/logrus"
 	"time"
 )

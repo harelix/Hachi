@@ -2,8 +2,8 @@ package internal
 
 import (
 	"encoding/base64"
-	"github.com/gilbarco-ai/Hachi/pkg/cryptography"
-	"github.com/gilbarco-ai/Hachi/pkg/messages"
+	"github.com/rills-ai/Hachi/pkg/cryptography"
+	"github.com/rills-ai/Hachi/pkg/messages"
 	"strings"
 )
 

@@ -10,13 +10,13 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/gilbarco-ai/Hachi/pkg/api/docs"
-	"github.com/gilbarco-ai/Hachi/pkg/api/routes"
-	"github.com/gilbarco-ai/Hachi/pkg/api/tracing"
-	"github.com/gilbarco-ai/Hachi/pkg/config"
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	echoMw "github.com/labstack/echo/v4/middleware"
+	_ "github.com/rills-ai/Hachi/pkg/api/docs"
+	"github.com/rills-ai/Hachi/pkg/api/routes"
+	"github.com/rills-ai/Hachi/pkg/api/tracing"
+	"github.com/rills-ai/Hachi/pkg/config"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 

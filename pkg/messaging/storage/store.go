@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/gilbarco-ai/Hachi/pkg/messaging"
+import "github.com/rills-ai/Hachi/pkg/messaging"
 
 //Adds a new KV Store Bucket
 func Add() {

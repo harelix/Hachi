@@ -72,21 +72,6 @@ dna "controller" {
 
   #Drivers support interpreting node attributes and runtime environment
   tracts {
-    #Don't remove these endpoints as they provide selectors encryption capability to Hachi
-    stream "encrypt" {
-      async = false
-      subject = ["__internal__.crypto.encrypt#selector"]
-      verb = "POST"
-      local = "/hrl/encrypt"
-    }
-    stream "decrypt" {
-      async = false
-      subject = ["__internal__.crypto.decrypt#selector"]
-      verb = "POST"
-      local = "/hrl/decrypt"
-    }
-    #Don't remove these endpoints as they provide selectors encryption capability to Hachi
-
     stream "gossip" {
       async = true
       verb = "POST"
@@ -110,7 +95,7 @@ dna "controller" {
       }
     }
 
-    stream "speak" {
+    stream "shout" {
       async = true
       verb = "POST"
       subject = ["cns.brain.{{.route::lobe}}.{{.route::region}}","ORDER.cns","neurostream.controller.to.agents"]

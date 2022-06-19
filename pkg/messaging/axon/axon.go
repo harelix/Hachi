@@ -1,7 +1,7 @@
 package axon
 
 import (
-	"github.com/gilbarco-ai/Hachi/pkg/messages"
+	"github.com/rills-ai/Hachi/pkg/messages"
 )
 
 func SelectiveDispatcher(capsule messages.Capsule) {

@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/common-nighthawk/go-figure"
-	HachiContext "github.com/gilbarco-ai/Hachi/pkg"
-	"github.com/gilbarco-ai/Hachi/pkg/api"
-	"github.com/gilbarco-ai/Hachi/pkg/config"
-	"github.com/gilbarco-ai/Hachi/pkg/messaging"
+	HachiContext "github.com/rills-ai/Hachi/pkg"
+	"github.com/rills-ai/Hachi/pkg/api"
+	"github.com/rills-ai/Hachi/pkg/config"
+	"github.com/rills-ai/Hachi/pkg/messaging"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -82,7 +82,7 @@ func main() {
 func PrintHachiWelcome() {
 
 	time.Sleep(50 * time.Millisecond)
-	myFigure := figure.NewFigure("8/Hachi", "doom", true)
+	myFigure := figure.NewFigure("8//Hachi", "doom", true)
 	myFigure.Print()
 	//print shitty text
 	message := fmt.Sprintf("\nHachi@Relix, instance name '%s', version %d", config.New().Service.DNA.Name, config.New().Service.Version)

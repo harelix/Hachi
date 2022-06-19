@@ -6,8 +6,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/gilbarco-ai/Hachi/pkg/config"
 	"github.com/nats-io/nats.go"
+	"github.com/rills-ai/Hachi/pkg/config"
 )
 
 // Copyright 2022-2022 The HACHI Author

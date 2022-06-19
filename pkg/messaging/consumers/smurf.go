@@ -1,8 +1,8 @@
 package consumers
 
 import (
-	"github.com/gilbarco-ai/Hachi/pkg/config"
 	"github.com/nats-io/nats.go"
+	"github.com/rills-ai/Hachi/pkg/config"
 )
 
 func ConstructConsumerConfig(agent config.IAgent) []nats.ConsumerConfig {

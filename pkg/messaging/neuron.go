@@ -2,16 +2,16 @@ package messaging
 
 import (
 	"fmt"
-	"github.com/gilbarco-ai/Hachi/pkg/messaging/consumers"
+	"github.com/rills-ai/Hachi/pkg/messaging/consumers"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	HachiContext "github.com/gilbarco-ai/Hachi/pkg"
-	"github.com/gilbarco-ai/Hachi/pkg/config"
-	"github.com/gilbarco-ai/Hachi/pkg/messages"
 	"github.com/nats-io/nats.go"
+	HachiContext "github.com/rills-ai/Hachi/pkg"
+	"github.com/rills-ai/Hachi/pkg/config"
+	"github.com/rills-ai/Hachi/pkg/messages"
 )
 
 import (

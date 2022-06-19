@@ -3,17 +3,17 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"github.com/gilbarco-ai/Hachi/pkg/config"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/v2/jwt"
+	"github.com/rills-ai/Hachi/pkg/config"
 	"golang.org/x/exp/slices"
 	"net/http"
 )
 
 func AuthenticationMiddleware() echo.MiddlewareFunc {
 
-	authConfig := config.New().Service.Agent.API.Auth
+	authConfig := config.New().Service.DNA.API.Auth
 
 	// initialize JWT middleware instance
 	return middleware.JWTWithConfig(middleware.JWTConfig{
