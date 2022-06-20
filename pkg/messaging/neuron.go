@@ -36,13 +36,17 @@ func (hn *HachiNeuron) GetBufferSize() int {
 	return hn.bufferSize
 }
 
-// TODO Get will show up as messaging.Get() outside, maybe should switch to neuron package so it shows neuron.Get(), or rename func to Neuron()
 func Get() *HachiNeuron {
 	once.Do(func() {
 		instance = &HachiNeuron{}
 		instance.bufferSize = 10
 	})
 	return instance
+}
+
+// RegisterMiddleware : for future use: register Hachi middleware
+func (hn *HachiNeuron) RegisterMiddleware() error {
+	return nil
 }
 
 func (hn *HachiNeuron) Init(ctx context.Context) error {

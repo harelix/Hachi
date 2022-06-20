@@ -17,7 +17,6 @@ import (
 func RegisterRoutes(e *echo.Echo) error {
 
 	apiVersion := strconv.Itoa(config.New().Service.DNA.API.Version)
-
 	err := BindInstrumentationHandlers(e.Group("/"))
 	if err != nil {
 		return fmt.Errorf("failed to bind instrumentation: %w", err)

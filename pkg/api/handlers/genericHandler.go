@@ -63,23 +63,25 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 		})
 
 	if directive != "" {
+		//internal actions execution
 		response := internal.Exec(capsule, directive)
 		m := map[string]any{
 			"data": response,
 			"path": capsule.Subject,
 		}
 		return m, nil
-	} else {
-		err := messaging.Get().Publish(ctx, capsule)
-		if err != nil {
-			return nil, err
-		}
-		m := map[string]any{
-			"data": HachiContext.PublishSuccessful,
-			"path": capsule.Subject,
-		}
-		return m, nil
 	}
+
+	//main message/action relay/execution
+	err := messaging.Get().Publish(ctx, capsule)
+	if err != nil {
+		return nil, err
+	}
+	m := map[string]any{
+		"data": HachiContext.PublishSuccessful,
+		"path": capsule.Subject,
+	}
+	return m, nil
 }
 
 func InterpolateRoutingKeyFromRouteParams(c echo.Context, route config.RouteConfig) []string {

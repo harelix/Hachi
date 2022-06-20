@@ -14,6 +14,11 @@ dna "controller" {
     identifiers = []
   }
 
+  nats {
+    addr = "0.0.0.0"
+    port = 4222
+  }
+
   http {
     addr = "0.0.0.0"
     port = 3007
@@ -39,7 +44,6 @@ dna "controller" {
     //https://github.com/dgraph-io/badger
   }
 
-
   hrl {
     crypto {
       provider = "AES"
@@ -50,7 +54,6 @@ dna "controller" {
 
   stream {
     //avoid being over-flooded/attacked by rogue dispatchers
-
     circuit_breaker {
       enabled = true
       max_requests = 100  //uint32
@@ -63,11 +66,6 @@ dna "controller" {
       enabled = true
       strategy = "default"
     }
-  }
-
-  nats {
-    addr = "0.0.0.0"
-    port = 4222
   }
 
   #Drivers support interpreting node attributes and runtime environment

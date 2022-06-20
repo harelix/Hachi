@@ -73,17 +73,17 @@ func New() *HachiConfig {
 }
 
 type DNAConfig struct {
-	Name           string           `hcl:"name,label"`
-	API            APIConfig        `hcl:"api,block"`
-	Controller     controllerConfig `hcl:"controller,block"`
-	Agent          agentConfig      `hcl:"agent,block"`
-	Storage        StorageConfig    `hcl:"storage,block"`
-	Tracts         TractsConfig     `hcl:"tracts,block"`
-	Stream         StreamConfig     `hcl:"stream,block"`
-	HRL            HRLConfig        `hcl:"hrl,block"`
-	Nats           NatsConfig       `hcl:"nats,block"`
-	KV             KVConfig         `hcl:"kv_db,block"`
-	Http           ServerConfig     `hcl:"http,block"`
+	Name           string            `hcl:"name,label"`
+	API            APIConfig         `hcl:"api,block"`
+	Controller     *controllerConfig `hcl:"controller,block"`
+	Agent          *agentConfig      `hcl:"agent,block"`
+	Storage        StorageConfig     `hcl:"storage,block"`
+	Tracts         TractsConfig      `hcl:"tracts,block"`
+	Stream         StreamConfig      `hcl:"stream,block"`
+	HRL            HRLConfig         `hcl:"hrl,block"`
+	Nats           NatsConfig        `hcl:"nats,block"`
+	KV             KVConfig          `hcl:"kv_db,block"`
+	Http           ServerConfig      `hcl:"http,block"`
 	InternalTracts TractsConfig
 }
 
@@ -247,7 +247,7 @@ func (config *HachiConfig) ParseFile(filePath string) error {
 		return fmt.Errorf("failed to interpolate config: %w", err)
 	}
 
-	//itnernal configuration file parsing
+	//internal configuration file parsing
 	config.internalTractsConfig, err = ioutil.ReadFile("conf.d/internals/internals.hcl")
 	if err != nil {
 		return fmt.Errorf("failed to read file: %w", err)
