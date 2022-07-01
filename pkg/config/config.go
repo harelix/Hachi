@@ -63,6 +63,7 @@ type ServiceInternals struct {
 type InternalDNA struct {
 	Name   string       `hcl:"name,label"`
 	Tracts TractsConfig `hcl:"tracts,block"`
+	//Webhooks TractsConfig `hcl:"webhooks,block"`
 }
 
 func New() *HachiConfig {
@@ -181,10 +182,26 @@ type RouteConfig struct {
 	Subject                    []string            `hcl:"subject,optional"`
 	Verb                       string              `hcl:"verb"`
 	Local                      string              `hcl:"local"`
-	Remote                     string              `hcl:"remote,optional"`
+	Remote                     RemoteExecConfig    `hcl:"remote,block"`
 	Headers                    map[string][]string `hcl:"headers,optional"`
 	IndexedInterpolationValues map[string]string
 	Payload                    string `hcl:"payload,optional"`
+}
+
+type RemoteExecConfig struct {
+	HTTP    *HTTPExecConfig `hcl:"http,block"`
+	SSH     *SSHExecConfig  `hcl:"ssh,block"`
+	Webhook *WebhookConfig  `hcl:"webhook,block"`
+}
+
+type WebhookConfig struct {
+	Event string `hcl:"event"`
+}
+
+type HTTPExecConfig struct {
+	URL string `hcl:"url"`
+}
+type SSHExecConfig struct {
 }
 
 type StreamConfig struct {

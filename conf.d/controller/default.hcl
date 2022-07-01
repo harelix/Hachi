@@ -70,12 +70,42 @@ dna "controller" {
 
   #Drivers support interpreting node attributes and runtime environment
   tracts {
+    //event from url
+    stream "trigger_webhook" {
+      async = true
+      verb = "POST"
+      subject = ["agents.selector.{{.route::selector}}"]
+      local = "/events/:event/selector/:selector"
+      remote {
+        webhook {
+          event = "{{.route::event}}"
+        }
+      }
+    }
+
+    //static event from configuration
+    stream "trigger_webhook_const_event" {
+      async = true
+      verb = "POST"
+      subject = ["agents.selector.{{.route::selector}}"]
+      local = "/selector/:selector"
+      remote {
+        webhook {
+          event = "EVENT.DATA.SOME_DATA_CHANGE"
+        }
+      }
+    }
+
     stream "gossip" {
       async = true
       verb = "POST"
       subject = ["neurostream.controller.to.agents"]
       local = "/test"
-      remote = "{{.remote::service_addr}}/"
+      remote {
+        http {
+          url = "{{.remote::service_addr}}/"
+        }
+      }
       headers = {
         "hachi-token" = ["{{.local::static_token}}"]
       }
@@ -85,8 +115,12 @@ dna "controller" {
       async = true
       verb = "POST"
       subject = ["cns.brain.{{.route::lobe}}.{{.route::region}}","ORDER.cns","neurostream.controller.to.agents"]
-      local = "/api/v2/transactions/upload/:transtype"
-      remote = "{{.storix_addr}}/p97/gift"
+      local = "/transactions/upload/:transtype"
+      remote {
+        http {
+          url = "{{.storix_addr}}/p97/gift"
+        }
+      }
       headers = {
         "hachi-relay-x" = ["{{.remote::relay_service_addr}}", "{{.local::static_token}}"]
         "hachi-token" = ["{{.local::static_token}}"]
@@ -98,7 +132,11 @@ dna "controller" {
       verb = "POST"
       subject = ["cns.brain.{{.route::lobe}}.{{.route::region}}","ORDER.cns","neurostream.controller.to.agents"]
       local = "/cns/brain/:lobe/region/:region"
-      remote = "{{.remote::audio_device_addr}}/{{.local::audio_quality}}/sonant"
+      remote {
+        http {
+          url = "{{.remote::audio_device_addr}}/{{.local::audio_quality}}/sonant"
+        }
+      }
       headers = {
         "hachi-relay-x" = ["{{.remote::relay_service_addr}}", "{{.local::static_token}}"]
         "hachi-token" = ["{{.local::static_token}}"]
