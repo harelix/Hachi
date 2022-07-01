@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"github.com/rills-ai/Hachi/pkg/api/webhooks"
 	"github.com/rills-ai/Hachi/pkg/helper"
 	"github.com/rills-ai/Hachi/pkg/internal"
 	"io"
@@ -17,6 +18,8 @@ import (
 )
 
 func HachiGenericHandler(c echo.Context, route config.RouteConfig) error {
+
+	webhooks.Construct().Notify("Yay!")
 
 	subjects := InterpolateRoutingKeyFromRouteParams(c, route)
 	headers := c.Request().Header

@@ -3,16 +3,18 @@ package routes
 import (
 	"errors"
 	"fmt"
+	"github.com/labstack/echo/v4"
+	"github.com/rills-ai/Hachi/pkg/api/handlers"
+	"github.com/rills-ai/Hachi/pkg/api/webhooks"
+	"github.com/rills-ai/Hachi/pkg/config"
+	"golang.org/x/exp/slices"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/labstack/echo/v4"
-	"github.com/rills-ai/Hachi/pkg/api/handlers"
-	"github.com/rills-ai/Hachi/pkg/config"
-	"golang.org/x/exp/slices"
 )
+
+var webhookDispatcher *webhooks.Dispatcher
 
 func RegisterRoutes(e *echo.Echo) error {
 
@@ -22,11 +24,15 @@ func RegisterRoutes(e *echo.Echo) error {
 		return fmt.Errorf("failed to bind instrumentation: %w", err)
 	}
 
-	versionedAPI := e.Group("/api/v" + apiVersion)
-	err = BindRoutesFromConfiguration(versionedAPI)
+	APIBaseRouteGroup := e.Group("/api/v" + apiVersion)
+	err = BindRoutesFromConfiguration(APIBaseRouteGroup)
 	if err != nil {
 		return fmt.Errorf("failed to bind routes: %w", err)
 	}
+
+	//Bind Webhooks
+	webhooks.Construct().BindWebhooks(APIBaseRouteGroup)
+
 	//these methods should always be last (after routes registration or move them to )
 	//server discovery methods
 	e.GET("/routes", func(routes []*echo.Route) echo.HandlerFunc {
@@ -55,7 +61,7 @@ func BindRoutesFromConfiguration(group *echo.Group) error {
 			path = "/" + path
 		}
 
-		//just nice
+		//funny: just nice
 		lcasedRoute := strings.ToLower(path)
 		verb := strings.ToUpper(stream.Verb)
 		//capture loop variables (route) in go closure
