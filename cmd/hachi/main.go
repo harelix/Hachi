@@ -84,7 +84,6 @@ func PrintHachiWelcome() {
 	time.Sleep(50 * time.Millisecond)
 	myFigure := figure.NewFigure("8//Hachi", "doom", true)
 	myFigure.Print()
-	//print shitty text
 	message := fmt.Sprintf("\nHachi@Relix, instance name '%s', version %d", config.New().Service.DNA.Name, config.New().Service.Version)
 	fmt.Println(message)
 }
