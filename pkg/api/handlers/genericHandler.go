@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"github.com/rills-ai/Hachi/pkg/api/webhooks"
 	"github.com/rills-ai/Hachi/pkg/helper"
 	"github.com/rills-ai/Hachi/pkg/internal"
 	"io"
@@ -17,9 +16,9 @@ import (
 	"github.com/rills-ai/Hachi/pkg/messaging"
 )
 
-func HachiGenericHandler(c echo.Context, route config.RouteConfig) error {
+func GenericHandler(c echo.Context, route config.RouteConfig) error {
 
-	webhooks.Construct().Notify("Yay!")
+	//webhooks.Construct().Notify("Yay!")
 
 	subjects := InterpolateRoutingKeyFromRouteParams(c, route)
 	headers := c.Request().Header
@@ -59,6 +58,7 @@ func HachiGenericHandler(c echo.Context, route config.RouteConfig) error {
 
 func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsule) (map[string]any, error) {
 
+	//remove internal instruction and handle a message by its remote sub-type!!!!!
 	//checks for an internal instruction
 	directive := helper.CollectionFunc[string](capsule.Subject,
 		func(value string) bool {

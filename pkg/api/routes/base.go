@@ -74,7 +74,7 @@ func BindRoutesFromConfiguration(group *echo.Group) error {
 		registeredRoute := group.Add(verb, lcasedRoute,
 			func(route config.RouteConfig) echo.HandlerFunc {
 				return func(c echo.Context) error {
-					return handlers.HachiGenericHandler(c, DecorateRoute(route))
+					return handlers.GenericHandler(c, DecorateRoute(route))
 				}
 			}(stream),
 		)

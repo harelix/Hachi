@@ -189,9 +189,14 @@ type RouteConfig struct {
 }
 
 type RemoteExecConfig struct {
-	HTTP    *HTTPExecConfig `hcl:"http,block"`
-	SSH     *SSHExecConfig  `hcl:"ssh,block"`
-	Webhook *WebhookConfig  `hcl:"webhook,block"`
+	HTTP     *HTTPExecConfig `hcl:"http,block"`
+	SSH      *SSHExecConfig  `hcl:"ssh,block"`
+	Webhook  *WebhookConfig  `hcl:"webhook,block"`
+	Internal *InternalConfig `hcl:"internal,block"`
+}
+
+type InternalConfig struct {
+	Type string `hcl:"directive"`
 }
 
 type WebhookConfig struct {
