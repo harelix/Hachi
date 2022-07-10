@@ -15,25 +15,16 @@ import (
 	echoMw "github.com/labstack/echo/v4/middleware"
 	_ "github.com/rills-ai/Hachi/pkg/api/docs"
 	"github.com/rills-ai/Hachi/pkg/api/routes"
-	"github.com/rills-ai/Hachi/pkg/api/tracing"
 	"github.com/rills-ai/Hachi/pkg/config"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 //StartAPIServer will panic if it cannot start the server
 func StartAPIServer(ctx context.Context) {
 
-	tracer.Start(
-		tracer.WithService("hachi-hq"),
-		tracer.WithEnv("staging"),
-		tracer.WithServiceVersion("inception"),
-	)
-	defer tracer.Stop()
-
 	serverConfig := config.New().Service.DNA.API
 
 	e := echo.New()
-	e.Use(tracing.Middleware(tracing.WithServiceName("Hachi-" + config.New().Service.Type.String())))
+	//e.Use(tracing.Middleware(tracing.WithServiceName("Hachi-" + config.New().Service.Type.String())))
 	e.Use(echoMw.Logger())
 	// the Gzip middleware has a high cost, maybe its better applied at the routing level to a specific endpoint?
 	e.Use(echoMw.GzipWithConfig(echoMw.GzipConfig{

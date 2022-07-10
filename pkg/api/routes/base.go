@@ -30,7 +30,10 @@ func RegisterRoutes(e *echo.Echo) error {
 		return fmt.Errorf("failed to bind routes: %w", err)
 	}
 
-	//Bind Webhooks
+	/*
+		Bind Webhooks
+	*/
+
 	webhooks.Construct().BindWebhooks(APIBaseRouteGroup)
 
 	//these methods should always be last (after routes registration or move them to )
