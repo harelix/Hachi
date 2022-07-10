@@ -2,11 +2,203 @@
 	"info": {
 		"_postman_id": "6a60fa08-f442-4ae0-8abe-036ee8d3d57e",
 		"name": "Hachi",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5026172"
 	},
 	"item": [
 		{
-			"name": "apc",
+			"name": "controller to agents",
+			"item": [
+				{
+					"name": "Request for cpu_utilization",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "hachi-x-author",
+								"value": "relix",
+								"type": "text"
+							},
+							{
+								"key": "hachi-authz",
+								"value": "root",
+								"type": "text"
+							},
+							{
+								"key": "hachi-authn",
+								"value": "234h97sydfy3o458hy3453y",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"speak\" : \"Say hello to the rug's topography It holds quite a lot of interest with your face down on it\",\r\n    \"language\" : \"en-US\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3007/api/v1/metrics/type/utilization",
+							"host": [
+								"localhost"
+							],
+							"port": "3007",
+							"path": [
+								"api",
+								"v1",
+								"metrics",
+								"type",
+								"utilization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for db_size",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "hachi-x-author",
+								"value": "relix",
+								"type": "text"
+							},
+							{
+								"key": "hachi-authz",
+								"value": "root",
+								"type": "text"
+							},
+							{
+								"key": "hachi-authn",
+								"value": "234h97sydfy3o458hy3453y",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"speak\" : \"Say hello to the rug's topography It holds quite a lot of interest with your face down on it\",\r\n    \"language\" : \"en-US / {{.route::type}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3007/api/v1/metrics/type/db_size",
+							"host": [
+								"localhost"
+							],
+							"port": "3007",
+							"path": [
+								"api",
+								"v1",
+								"metrics",
+								"type",
+								"db_size"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Decrypt",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "hachi-x-author",
+						"value": "relix",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authz",
+						"value": "root",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authn",
+						"value": "234h97sydfy3o458hy3453y",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"speak\" : \"Say hello to the rug's topography It holds quite a lot of interest with your face down on it.\",\r\n    \"language\" : \"en-US\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3007/api/v1/hrl/decrypt",
+					"host": [
+						"localhost"
+					],
+					"port": "3007",
+					"path": [
+						"api",
+						"v1",
+						"hrl",
+						"decrypt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Encrypt",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "hachi-x-author",
+						"value": "relix",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authz",
+						"value": "root",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authn",
+						"value": "234h97sydfy3o458hy3453y",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"speak\" : \"Say hello to the rug's topography It holds quite a lot of interest with your face down on it.\",\r\n    \"language\" : \"en-US\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3007/api/v1/hrl/encrypt",
+					"host": [
+						"localhost"
+					],
+					"port": "3007",
+					"path": [
+						"api",
+						"v1",
+						"hrl",
+						"encrypt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Controller To Agents",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -36,7 +228,7 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:3007/api/v1/cns/brain/frontal/region/broca",
+					"raw": "localhost:3007/api/v1/test",
 					"host": [
 						"localhost"
 					],
@@ -44,11 +236,52 @@
 					"path": [
 						"api",
 						"v1",
-						"cns",
-						"brain",
-						"frontal",
-						"region",
-						"broca"
+						"test"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Agent to Controller",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "hachi-x-author",
+						"value": "relix",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authz",
+						"value": "root",
+						"type": "text"
+					},
+					{
+						"key": "hachi-authn",
+						"value": "234h97sydfy3o458hy3453y",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"speak\" : \"Say hello to the rug's topography It holds quite a lot of interest with your face down on it\",\r\n    \"language\" : \"en-US\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3008/api/v1/test",
+					"host": [
+						"localhost"
+					],
+					"port": "3008",
+					"path": [
+						"api",
+						"v1",
+						"test"
 					]
 				}
 			},
@@ -131,6 +364,70 @@
 						"frontal",
 						"region",
 						"broca"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Webhook",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\" : \"n\",\r\n    \"destination\" : \"http://localhost:3007/api/v1/events/{{event}}/selector/{{selector}}\",\r\n    \"registers\" : [\"EVENTS.DB_UPDATE\", \"EVENTS.PULSE\"],\r\n    \"token\" : \"thisisnotwhereAtokenShouldBe\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3007/api/v1/webhooks/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3007",
+					"path": [
+						"api",
+						"v1",
+						"webhooks",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Trigger Webhook",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\" : \"n\",\r\n    \"destination\" : \"d\",\r\n    \"registers\" : [\"EVENTS.DB_UPDATE\", \"EVENTS.PULSE\"],\r\n    \"token\" : \"thisisnotwhereAtokenShouldBe\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3007/api/v1/events/{{event}}/selector/{{selector}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3007",
+					"path": [
+						"api",
+						"v1",
+						"events",
+						"{{event}}",
+						"selector",
+						"{{selector}}"
 					]
 				}
 			},
