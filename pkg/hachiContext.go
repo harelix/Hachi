@@ -27,6 +27,9 @@ const (
 
 	//Server responses
 	PublishSuccessful string = "message hyper-jumped through wormhole, i.e. everything is groovy, we're golden!"
+
+	//Error messages
+	DuplicateRouteDefinitionMessage string = "check your config file for duplicate values in route/stream definition in %v"
 )
 
 var (

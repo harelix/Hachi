@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	HachiContext "github.com/rills-ai/Hachi/pkg"
 	"github.com/rills-ai/Hachi/pkg/api/handlers"
 	"github.com/rills-ai/Hachi/pkg/api/webhooks"
 	"github.com/rills-ai/Hachi/pkg/config"
@@ -13,8 +14,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-var webhookDispatcher *webhooks.Dispatcher
 
 func RegisterRoutes(e *echo.Echo) error {
 
@@ -33,11 +32,11 @@ func RegisterRoutes(e *echo.Echo) error {
 	/*
 		Bind Webhooks
 	*/
-
 	webhooks.Construct().BindWebhooks(APIBaseRouteGroup)
-
-	//these methods should always be last (after routes registration or move them to )
-	//server discovery methods
+	/*
+		these methods should always be last (after routes registration or move them to )
+		server discovery methods
+	*/
 	e.GET("/routes", func(routes []*echo.Route) echo.HandlerFunc {
 		//_routes := routes
 		return func(c echo.Context) error {
@@ -56,6 +55,11 @@ func BindRoutesFromConfiguration(group *echo.Group) error {
 
 	internalStreams := config.New().Service.DNA.InternalTracts.Streams
 	streams := append(internalStreams, config.New().Service.DNA.Tracts.Streams...)
+
+	err := checkForRouteDuplicates(streams)
+	if err != nil {
+		return err
+	}
 
 	for _, stream := range streams {
 		path := stream.Local
@@ -84,6 +88,18 @@ func BindRoutesFromConfiguration(group *echo.Group) error {
 
 		registeredRoute.Name = stream.Name
 		fmt.Println(" config route register; name: " + registeredRoute.Name + " : " + registeredRoute.Path)
+	}
+	return nil
+}
+
+func checkForRouteDuplicates(streams []config.RouteConfig) error {
+	routesMap := make(map[string]bool)
+	for _, stream := range streams {
+		routeDef := stream.Local
+		if _, ok := routesMap[routeDef]; ok {
+			return fmt.Errorf(HachiContext.DuplicateRouteDefinitionMessage, routeDef)
+		}
+		routesMap[routeDef] = true
 	}
 	return nil
 }

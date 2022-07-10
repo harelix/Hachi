@@ -145,26 +145,17 @@ dna "controller" {
     stream "simple_async_result" {
       async = true
       verb = "POST"
-      subject = ["stations.>"]
+      subject = ["stations.>.{{.route::type}}"]
       local = "/metrics/type/:type"
       remote {
         http {
           url = "metrics_service.remote_server:8080/metrics/{{.route::type}}"
         }
       }
-      headers = {}
-    }
-    stream "simple_async_result_override" {
-      async = true
-      verb = "POST"
-      subject = ["stations.>"]
-      local = "/metrics/type/:type"
-      remote {
-        http {
-          url = "metrics_service.remote_server:8080/metrics/{{.route::type}}"
-        }
+      headers = {
+        "hachi-relay-x" = ["{{.remote::relay_service_addr}}", "{{.route::type}}"]
+        "hachi-token" = ["{{.local::static_token}}"]
       }
-      headers = {}
     }
   }
 }

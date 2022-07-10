@@ -48,9 +48,9 @@ func StartAPIServer(ctx context.Context) {
 		//e.Use(auth.AuthenticationMiddleware())
 	}
 	//routes bindings
-	errx := routes.RegisterRoutes(e)
-	if errx != nil {
-		e.Logger.Panic(errx)
+	err := routes.RegisterRoutes(e)
+	if err != nil {
+		e.Logger.Panic(err)
 	}
 
 	quit := make(chan os.Signal, 1)

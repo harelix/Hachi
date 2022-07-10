@@ -32,7 +32,6 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 		} else if len(b) == 0 {
 			return echo.NewHTTPError(http.StatusExpectationFailed, HachiContext.ErrBodyEmpty.Error())
 		}
-		// TODO what if payload is not empty
 		body = string(b)
 	}
 
@@ -87,6 +86,7 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 	return m, nil
 }
 
+//todo: interpolate route params for every field/member on our capsule (remote, subjects, headers,body, etc.)
 func InterpolateRoutingKeyFromRouteParams(c echo.Context, route config.RouteConfig) []string {
 
 	for name, pattern := range route.IndexedInterpolationValues {
