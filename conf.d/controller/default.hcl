@@ -124,7 +124,6 @@ dna "controller" {
       headers = {
         "hachi-relay-x" = ["{{.remote::relay_service_addr}}", "{{.local::static_token}}"]
         "hachi-token" = ["{{.local::static_token}}"]
-        "password" = "123345sdf"
       }
     }
 

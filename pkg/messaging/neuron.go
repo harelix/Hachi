@@ -8,16 +8,13 @@ import (
 	"sync"
 	"time"
 
+	"context"
+	"encoding/json"
 	"github.com/nats-io/nats.go"
 	HachiContext "github.com/rills-ai/Hachi/pkg"
 	"github.com/rills-ai/Hachi/pkg/config"
 	"github.com/rills-ai/Hachi/pkg/messages"
-)
-
-import (
-	"context"
-	"encoding/json"
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 var once sync.Once
@@ -91,6 +88,11 @@ func (hn *HachiNeuron) Connect(ctx context.Context, retry int) error {
 	if err != nil {
 		return fmt.Errorf("failed to initiate JetSteam connection: %w", err)
 	}
+
+	log.WithFields(log.Fields{
+		"agent_type": config.New().IAM.GetType(),
+		"NATS_addr":  config.New().Service.DNA.Nats.Address,
+	}).Info("successfully connected to NATS server.")
 	//Provision our Default JETStream Consumers and Handlers
 	//======================================================
 	hn.ProvisionNATSJetStream()

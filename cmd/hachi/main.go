@@ -16,14 +16,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func main() {
-
+func init() {
+	// Log as JSON instead of the default ASCII formatter.
 	log.SetFormatter(&log.JSONFormatter{})
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
 	log.SetOutput(os.Stdout)
 	// Only log the warning severity or above.
-	log.SetLevel(log.WarnLevel)
+	log.SetLevel(log.InfoLevel)
+}
+
+func main() {
+	log.SetReportCaller(true)
 
 	go PrintHachiWelcome()
 
@@ -60,7 +64,6 @@ func main() {
 
 	//bootstrap server
 	go api.StartAPIServer(ctx)
-
 	//init Hachi Neuron
 	err = messaging.Get().Init(ctx)
 	if err != nil {
@@ -69,7 +72,6 @@ func main() {
 	}
 	//go messaging.Get().SubscribeDefault()
 	//messaging.Get().Subscribe(dendrite.GetSubscriptionSubjects(config.New()))
-
 	//NATS connection close
 	defer messaging.Get().Close()
 	quit := make(chan os.Signal, 1)
@@ -80,9 +82,8 @@ func main() {
 }
 
 func PrintHachiWelcome() {
-
 	time.Sleep(50 * time.Millisecond)
-	myFigure := figure.NewFigure("8//Hachi", "doom", true)
+	myFigure := figure.NewFigure("8::Hachi", "doom", true)
 	myFigure.Print()
 	message := fmt.Sprintf("\nHachi@Relix, instance name '%s', version %d", config.New().Service.DNA.Name, config.New().Service.Version)
 	fmt.Println(message)
