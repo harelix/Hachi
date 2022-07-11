@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"github.com/rills-ai/Hachi/pkg/api/webhooks"
 	"github.com/rills-ai/Hachi/pkg/helper"
 	"github.com/rills-ai/Hachi/pkg/internal"
 	"io"
@@ -18,13 +19,15 @@ import (
 
 func GenericHandler(c echo.Context, route config.RouteConfig) error {
 
-	//webhooks.Construct().Notify("Yay!")
-
+	webhooks.Construct().Notify("Yay!")
 	subjects := InterpolateRoutingKeyFromRouteParams(c, route)
 	headers := c.Request().Header
 	body := route.Payload
 
-	//todo: no need for other HTTP verbs / Post and Get are symbolic for variant message and const message
+	/*
+		comment: no need for other HTTP verbs:
+		-	Post and Get are symbolic for variant message and const message
+	*/
 	if strings.ToUpper(route.Verb) == http.MethodPost {
 		b, err := io.ReadAll(c.Request().Body)
 		if err != nil {

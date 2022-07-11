@@ -36,9 +36,7 @@ func main() {
 
 	flag.Parse()
 
-	cLog := log.WithFields(log.Fields{
-		"appname": "hachi",
-	})
+	cLog := log.WithFields(log.Fields{"app_name": "Hachi"})
 
 	if *confile == "" {
 		cLog.Error("Hachi err! missing cli args 'c' path to config file!")
@@ -83,7 +81,7 @@ func main() {
 
 func PrintHachiWelcome() {
 	time.Sleep(50 * time.Millisecond)
-	myFigure := figure.NewFigure("8::Hachi", "doom", true)
+	myFigure := figure.NewFigure("8//Hachi", "doom", true)
 	myFigure.Print()
 	message := fmt.Sprintf("\nHachi@Relix, instance name '%s', version %d", config.New().Service.DNA.Name, config.New().Service.Version)
 	fmt.Println(message)

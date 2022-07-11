@@ -5,9 +5,13 @@ type KV struct {
 }
 
 func (kv *KV) Init() {
+
+	//opt := badger.DefaultOptions("").WithInMemory(true)
+
 	// thats way too much logic for init, shouldnt this be a constructor?
-	//KVStoreConfig := config.New().Service.Agent.KV
+	//KVStoreConfig := config.New().Service.DNA
 	//fmt.Println(KVStoreConfig)
+
 	//// It will be created if it doesn't exist.
 	//db, err := badger.Open(badger.DefaultOptions("").WithInMemory(true))
 	//

@@ -7,6 +7,6 @@ type APIError struct {
 func (error *APIError) Error() string {
 	return error.msg
 }
-func ThisFunctionReturnError(message string) error {
+func APIErrorResponse(message string) error {
 	return &APIError{message}
 }
