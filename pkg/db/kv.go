@@ -1,13 +1,13 @@
 package db
 
+import "github.com/dgraph-io/badger/v3"
+
 type KV struct {
-	//DB *badger.DB
+	DB *badger.DB
 }
 
 func (kv *KV) Init() {
-
-	//opt := badger.DefaultOptions("").WithInMemory(true)
-
+	opt := badger.DefaultOptions("")
 	// thats way too much logic for init, shouldnt this be a constructor?
 	//KVStoreConfig := config.New().Service.DNA
 	//fmt.Println(KVStoreConfig)
