@@ -13,6 +13,20 @@ dna "internals" {
       }
     }
 
+    /*
+    stream "edge_devices_registration" {
+      async   = false
+      subject = ["__internal__.selectors.ed#ed"]
+      verb    = "POST"
+      local   = "/hrl/edge_devices_registration"
+      remote {
+        internal {
+          directive = "encrypt"
+        }
+      }
+    }
+    */
+
     stream "encrypt" {
       async   = false
       subject = ["__internal__.crypto.encrypt#selector"]

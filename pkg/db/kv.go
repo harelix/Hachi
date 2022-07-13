@@ -7,7 +7,7 @@ type KV struct {
 }
 
 func (kv *KV) Init() {
-	opt := badger.DefaultOptions("")
+	//opt := badger.DefaultOptions("")
 	// thats way too much logic for init, shouldnt this be a constructor?
 	//KVStoreConfig := config.New().Service.DNA
 	//fmt.Println(KVStoreConfig)

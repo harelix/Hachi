@@ -1,0 +1,1 @@
+{"Created":"2022-07-12T18:40:48.216906583Z","Name":"","durable_name":"agentDefaultNeuroStreamConsumer","deliver_policy":"new","ack_policy":"explicit","ack_wait":30000000000,"max_deliver":3,"replay_policy":"instant","max_waiting":512,"max_ack_pending":20000}
