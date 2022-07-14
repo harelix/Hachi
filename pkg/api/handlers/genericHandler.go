@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/rills-ai/Hachi/pkg/api/webhooks"
 	"github.com/rills-ai/Hachi/pkg/helper"
@@ -20,7 +21,8 @@ import (
 func GenericHandler(c echo.Context, route config.RouteConfig) error {
 
 	webhooks.Construct().Notify("Yay!")
-	subjects := InterpolateRoutingKeyFromRouteParams(c, route)
+	//subjects := InterpolateContent(c, route)
+	subjects := route.Subject
 	headers := c.Request().Header
 	body := route.Payload
 
@@ -48,9 +50,13 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 		Subject: subjects,
 		Route:   &route,
 	}
-
+	interpolatedCapsule, err := interpolateCapsule(c, route, capsule)
+	if err != nil {
+		return err
+	}
+	fmt.Println(interpolatedCapsule)
 	//todo add err handling
-	response, err := DispatchCapsule(c, c.Request().Context(), capsule)
+	response, err := DispatchCapsule(c, c.Request().Context(), interpolatedCapsule)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusServiceUnavailable, fmt.Errorf("failed to dispatch request: %w", err).Error())
@@ -90,13 +96,29 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 }
 
 //todo: interpolate route params for every field/member on our capsule (remote, subjects, headers,body, etc.)
-func InterpolateRoutingKeyFromRouteParams(c echo.Context, route config.RouteConfig) []string {
+func InterpolateContent(c echo.Context, route config.RouteConfig, content string) (interpolatedContent string) {
 
 	for name, pattern := range route.IndexedInterpolationValues {
 		value := c.Param(name)
-		for idx, Avalue := range route.Subject {
-			route.Subject[idx] = strings.TrimSpace(strings.Replace(Avalue, pattern, value, -1))
-		}
+		interpolatedContent = strings.TrimSpace(strings.Replace(content, pattern, value, -1))
 	}
-	return route.Subject
+
+	return interpolatedContent
+}
+
+func interpolateCapsule(c echo.Context, route config.RouteConfig, capsule messages.Capsule) (messages.Capsule, error) {
+	jsonCapsule, err := json.Marshal(capsule)
+	if err != nil {
+		return messages.Capsule{}, err
+	}
+	stringCapsule := string(jsonCapsule)
+
+	interpolatedCapsule := InterpolateContent(c, route, stringCapsule)
+
+	err = json.Unmarshal([]byte(interpolatedCapsule), &capsule)
+	if err != nil {
+		return messages.Capsule{}, err
+	}
+
+	return capsule, nil
 }
