@@ -179,7 +179,7 @@ type TractsConfig struct {
 type RouteConfig struct {
 	Async                      bool                `hcl:"async,optional"`
 	Name                       string              `hcl:"name,label"`
-	Subject                    []string            `hcl:"subject,optional"`
+	Selectors                  []string            `hcl:"selectors,optional"`
 	Verb                       string              `hcl:"verb"`
 	Local                      string              `hcl:"local"`
 	Remote                     RemoteExecConfig    `hcl:"remote,block"`

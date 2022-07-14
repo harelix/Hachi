@@ -4,8 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/google/uuid"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/common-nighthawk/go-figure"
@@ -55,6 +57,8 @@ func main() {
 		log.Printf(err.Error())
 		os.Exit(1)
 	}
+
+	SelfProvisioning(config.New())
 	//config main service context
 	ctx, cancel := context.WithCancel(context.WithValue(context.Background(),
 		HachiContext.ContextIAM, config.New().IAM))
@@ -62,6 +66,7 @@ func main() {
 
 	//bootstrap server
 	go api.StartAPIServer(ctx)
+
 	//init Hachi Neuron
 	err = messaging.Get().Init(ctx)
 	if err != nil {
@@ -77,6 +82,16 @@ func main() {
 	<-quit
 	messaging.Get().Close()
 	ctx.Done()
+}
+
+func SelfProvisioning(config *config.HachiConfig) {
+	if config.Service.DNA.Controller.Enabled {
+		//todo: maybe a constant identifier
+	} else {
+		config.Service.DNA.Agent.Identifiers =
+			append(config.Service.DNA.Agent.Identifiers, fmt.Sprintf("%vRND%v", HachiContext.DefaultAgentIdentifierPrefix,
+				strings.Replace(uuid.New().String(), "-", "", -1)))
+	}
 }
 
 func PrintHachiWelcome() {

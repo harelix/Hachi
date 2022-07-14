@@ -58,7 +58,7 @@ func StartAPIServer(ctx context.Context) {
 	//todo: fix graceful shutdown
 	go func() {
 		if err := e.Start(":" + strconv.Itoa(config.New().Service.DNA.Http.Port)); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			e.Logger.Panic("shutting down the server")
+			e.Logger.Panic("shutting down the server, %v", err)
 		}
 	}()
 

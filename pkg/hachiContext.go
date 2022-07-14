@@ -11,6 +11,7 @@ const (
 	ContextCapsule                      string = "capsule"
 	ContextTimeoutMax                   int    = 1000 * 60
 
+	DefaultAgentIdentifierPrefix string = "agents."
 	//NATS - controller
 	ControllerNATSDefaultStream string = "controllerToagents-NeuroStream"
 	//from controller to agents

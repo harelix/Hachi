@@ -6,8 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 	HachiContext "github.com/rills-ai/Hachi/pkg"
 	"github.com/rills-ai/Hachi/pkg/api/handlers"
-	"github.com/rills-ai/Hachi/pkg/api/webhooks"
 	"github.com/rills-ai/Hachi/pkg/config"
+	"github.com/rills-ai/Hachi/pkg/webhooks"
 	"golang.org/x/exp/slices"
 	"net/http"
 	"regexp"
@@ -113,7 +113,7 @@ var routeRegex = regexp.MustCompile("{{\\.((route)::(.*?))}}")
 func IndexRoutesInterpolationKeys(route config.RouteConfig) config.RouteConfig {
 	route.IndexedInterpolationValues = make(map[string]string)
 
-	matches := routeRegex.FindAllStringSubmatch(strings.Join(route.Subject, " "), -1)
+	matches := routeRegex.FindAllStringSubmatch(strings.Join(route.Selectors, " "), -1)
 	for _, match := range matches {
 		route.IndexedInterpolationValues[match[3]] = match[0]
 	}

@@ -4,15 +4,19 @@ dna "agent" {
 
   controller {
     enabled = false
+    identifiers = []
+    invocation_timeout = -1
   }
 
   agent {
-    //what mode are we in (controller or agent)
-    enabled = true
     //It is recommended to keep the maximum number of tokens in your subjects to a reasonable value of 16
-    identifiers = ["{{.local::identifier}}", "{{.local::region}}", "{{.local::functionality}}"]
-    //how long before an invocation request must finish executing on the target agent - in nillisecond
-    invocation_timeout = 10000
+    enabled = false
+    identifiers = []
+  }
+
+  nats {
+    addr = "0.0.0.0"
+    port = 4222
   }
 
   http {
@@ -49,7 +53,7 @@ dna "agent" {
   }
 
   stream {
-    //avoid being over flooded/attacked by rogue dispatcher
+    //avoid being over-flooded/attacked by rogue dispatchers
     circuit_breaker {
       enabled = true
       max_requests = 100  //uint32
@@ -57,54 +61,13 @@ dna "agent" {
       timeout  = 3000     //time.Duration in seconds
     }
 
+    //nats
     deduping {
       enabled = true
       strategy = "default"
     }
   }
 
-  nats {
-    addr = "0.0.0.0"
-    port = 4222
-  }
-  
-  #drivers support interpreting node attributes and runtime environment
-  tracts {
-
-    stream "self_test" {
-      async = true
-      verb = "GET"
-      subject = ["neurostream.controller.to.agents"]
-      payload = <<EOF
-                {"name" : "testing", "addr" : "{{.remote::service_addr}}"}
-                EOF
-      local = "/selft"
-      remote = "{{.remote::service_addr}}/"
-      headers = {
-        "hachi-token" = ["{{.local::static_token}}"]
-      }
-    }
-
-    stream "gossip" {
-      async = true
-      verb = "GET"
-      subject = ["neurostream.agent.to.controller"]
-      local = "/test"
-      remote = "{{.remote::service_addr}}/"
-      headers = {
-        "hachi-token" = ["{{.local::static_token}}"]
-      }
-    }
-
-    stream "speak" {
-      verb = "POST"
-      subject = ["cns.brain.{{.route::lobe}}.{{.route::region}}","neurostream.agent.to.controller","ORDER.cns.{{.route::region}}"]
-      local = "/cns/brain/:lobe/region/:region"
-      remote = "{{.remote::audio_device_addr}}/{{.local::audio_quality}}/sonant"
-      headers = {
-        "hachi-relay" = ["{{.remote::relay_service_addr}}"]
-        "hachi-token" = ["{{.local::static_token}}"]
-      }
-    }
-  }
+  #Drivers support interpreting node attributes and runtime environment
+  tracts {}
 }

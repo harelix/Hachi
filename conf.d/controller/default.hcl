@@ -70,11 +70,27 @@ dna "controller" {
 
   #Drivers support interpreting node attributes and runtime environment
   tracts {
+
+    stream "simple_async_result" {
+      async = true
+      verb = "POST"
+      selectors = ["stations.>.{{.route::type}}", "agent.internal.>"]
+      local = "/metrics/type/:type"
+      remote {
+        http {
+          url = "metrics_service.remote_server:8080/metrics/{{.route::type}}"
+        }
+      }
+      headers = {
+        "hachi-relay-x" = ["{{.remote::relay_service_addr}}", "{{.route::type}}"]
+        "hachi-token" = ["{{.local::static_token}}"]
+      }
+    }
     //event from url
     stream "trigger_webhook" {
       async = true
       verb = "POST"
-      subject = ["agents.selector.{{.route::selector}}"]
+      selectors = ["agents.selector.{{.route::selector}}"]
       local = "/events/:event/selector/:selector"
       remote {
         webhook {
@@ -87,7 +103,12 @@ dna "controller" {
     stream "trigger_webhook_const_event" {
       async = true
       verb = "POST"
-      subject = ["agents.selector.{{.route::selector}}"]
+      selectors {
+        pattern {
+          values = ["agents.selector.{{.route::selector}}"]
+        }
+      }
+
       local = "/selector/:selector"
       remote {
         webhook {
@@ -99,7 +120,7 @@ dna "controller" {
     stream "gossip" {
       async = true
       verb = "POST"
-      subject = ["neurostream.controller.to.agents"]
+      selectors = ["neurostream.controller.to.agents"]
       local = "/test"
       remote {
         http {
@@ -114,7 +135,7 @@ dna "controller" {
     stream "speak" {
       async = true
       verb = "POST"
-      subject = ["cns.brain.{{.route::lobe}}.{{.route::region}}","ORDER.cns","neurostream.controller.to.agents"]
+      selectors = ["cns.brain.{{.route::lobe}}.{{.route::region}}","ORDER.cns","neurostream.controller.to.agents"]
       local = "/transactions/upload/:transtype"
       remote {
         http {
@@ -130,7 +151,7 @@ dna "controller" {
     stream "shout" {
       async = true
       verb = "POST"
-      subject = ["cns.brain.{{.route::lobe}}.{{.route::region}}","ORDER.cns","neurostream.controller.to.agents"]
+      selectors = ["cns.brain.{{.route::lobe}}.{{.route::region}}","ORDER.cns","neurostream.controller.to.agents"]
       local = "/cns/brain/:lobe/region/:region"
       remote {
         http {
@@ -139,21 +160,6 @@ dna "controller" {
       }
       headers = {
         "hachi-relay-x" = ["{{.remote::relay_service_addr}}", "{{.local::static_token}}"]
-        "hachi-token" = ["{{.local::static_token}}"]
-      }
-    }
-    stream "simple_async_result" {
-      async = true
-      verb = "POST"
-      subject = ["stations.>.{{.route::type}}"]
-      local = "/metrics/type/:type"
-      remote {
-        http {
-          url = "metrics_service.remote_server:8080/metrics/{{.route::type}}"
-        }
-      }
-      headers = {
-        "hachi-relay-x" = ["{{.remote::relay_service_addr}}", "{{.route::type}}"]
         "hachi-token" = ["{{.local::static_token}}"]
       }
     }

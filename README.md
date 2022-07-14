@@ -5,6 +5,37 @@ controller & The agents
 
 > hachi 八 means "Eight" or Bee in Japanese
 
+
+### <span style="background-color: #EFEFEF;color:#000;padding:0.2em">stream</span> Parameters 
+ - <span style="background-color: #EFEFEF;color:green;padding:0.2em">async</span> (bool)
+ - <span style="background-color: #EFEFEF;color:green;padding:0.2em">verb</span> (string)
+   At this time, Hachi supports the POST and GET (static body payload) verbs
+ - <span style="background-color: #EFEFEF;color:green;padding:0.2em">selectors</span> (pattern, all, dynamic)
+   - pattern
+   - all
+   - dynamic
+ - <span style="background-color: #EFEFEF;color:green;padding:0.2em">async</span> (bool)
+ - <span style="background-color: #EFEFEF;color:green;padding:0.2em">async</span> (bool)
+ 
+```hcl
+ stream "trigger_webhook_const_event" {
+      async = true
+      verb = "POST"
+      selectors {
+        pattern {
+          values = ["agents.selector.{{.route::selector}}"]
+        }
+      }
+
+      local = "/selector/:selector"
+      remote {
+        webhook {
+          event = "EVENT.DATA.SOME_DATA_CHANGE"
+        }
+      }
+    }
+```
+
 Secure, Performant, Agile, Resilient
 
 With reliable backbone services (NATS, Kafka*, Rabbit*), adaptive communication channels (personal and public), and leaf nodes customization, optimize communications for various invokation scenarios.
