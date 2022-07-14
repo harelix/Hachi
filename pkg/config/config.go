@@ -1,17 +1,13 @@
 package config
 
 import (
-	"errors"
 	"fmt"
+	"github.com/rills-ai/Hachi/pkg/interpolator"
 	"io/ioutil"
-	"os"
-	"regexp"
-	"strings"
 	"sync"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
-	"github.com/rills-ai/Hachi/pkg/helper"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -176,18 +172,6 @@ type TractsConfig struct {
 	Streams []RouteConfig `hcl:"stream,block"`
 }
 
-type RouteConfig struct {
-	Async                      bool                `hcl:"async,optional"`
-	Name                       string              `hcl:"name,label"`
-	Selectors                  []string            `hcl:"selectors,optional"`
-	Verb                       string              `hcl:"verb"`
-	Local                      string              `hcl:"local"`
-	Remote                     RemoteExecConfig    `hcl:"remote,block"`
-	Headers                    map[string][]string `hcl:"headers,optional"`
-	IndexedInterpolationValues map[string]string
-	Payload                    string `hcl:"payload,optional"`
-}
-
 type RemoteExecConfig struct {
 	HTTP     *HTTPExecConfig `hcl:"http,block"`
 	SSH      *SSHExecConfig  `hcl:"ssh,block"`
@@ -258,13 +242,15 @@ func (config *HachiConfig) ParseFile(filePath string) error {
 		},
 	}
 
+	//init interpolation values from Stanza and Envars
+	interpolator.InitInterpolationValues(config.Values.Values)
 	//main configuration file parsing
 	config.rawConfigValue, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to read file: %w", err)
 	}
 	baseConfigContent := string(config.rawConfigValue)
-	bc, err := config.InterpolateStrings(baseConfigContent)
+	bc, err := interpolator.InterpolateStrings(baseConfigContent)
 	if err != nil {
 		return fmt.Errorf("failed to interpolate config: %w", err)
 	}
@@ -275,7 +261,7 @@ func (config *HachiConfig) ParseFile(filePath string) error {
 		return fmt.Errorf("failed to read file: %w", err)
 	}
 	internalConfigContent := string(config.internalTractsConfig)
-	ic, err := config.InterpolateStrings(internalConfigContent)
+	ic, err := interpolator.InterpolateStrings(internalConfigContent)
 	if err != nil {
 		return fmt.Errorf("failed to interpolate config: %w", err)
 	}
@@ -317,6 +303,7 @@ func (config *HachiConfig) LoadStanzaValues(filePath string) error {
 	return nil
 }
 
+/*
 var InterpolationRegex = regexp.MustCompile("{{\\.((local|remote|route|resolver)::(.*?))}}")
 
 // InterpolateStrings  we currently support interpolation from envars and Hachi stanza vars
@@ -356,3 +343,4 @@ func (config *HachiConfig) InterpolateStrings(content string) (string, error) {
 	}
 	return content, nil
 }
+*/

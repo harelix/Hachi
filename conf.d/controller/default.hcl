@@ -103,12 +103,7 @@ dna "controller" {
     stream "trigger_webhook_const_event" {
       async = true
       verb = "POST"
-      selectors {
-        pattern {
-          values = ["agents.selector.{{.route::selector}}"]
-        }
-      }
-
+      selectors = ["agents.selector.{{.route::selector}}"]
       local = "/selector/:selector"
       remote {
         webhook {

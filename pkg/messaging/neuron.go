@@ -227,7 +227,7 @@ func (hn *HachiNeuron) Publish(ctx context.Context, capsule messages.Capsule) er
 	if err != nil {
 		return err
 	}
-	for _, subject := range capsule.Subject {
+	for _, subject := range capsule.Selectors {
 		err = hn.NC.Publish(subject, []byte(msg))
 		return err
 	}

@@ -4,23 +4,24 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/rills-ai/Hachi/pkg/internal"
-	"github.com/rills-ai/Hachi/pkg/webhooks"
-	"io"
-	"net/http"
-	"strings"
-
 	"github.com/labstack/echo/v4"
 	HachiContext "github.com/rills-ai/Hachi/pkg"
 	"github.com/rills-ai/Hachi/pkg/config"
+	"github.com/rills-ai/Hachi/pkg/internal"
+	"github.com/rills-ai/Hachi/pkg/interpolator"
 	"github.com/rills-ai/Hachi/pkg/messages"
 	"github.com/rills-ai/Hachi/pkg/messaging"
+	"github.com/rills-ai/Hachi/pkg/webhooks"
+	log "github.com/sirupsen/logrus"
+	"io"
+	"net/http"
+	"strings"
 )
 
 func GenericHandler(c echo.Context, route config.RouteConfig) error {
 
 	//webhooks.Construct().Notify("Yay!")
-	subjects := InterpolateRoutingKeyFromRouteParams(c, route)
+	selectors := route.Selectors
 	headers := c.Request().Header
 	body := route.Payload
 
@@ -43,25 +44,44 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 	}
 
 	capsule := messages.Capsule{
-		Message: body,
-		Headers: headers,
-		Subject: subjects,
-		Route:   &route,
+		Message:   body,
+		Headers:   headers,
+		Selectors: selectors,
+		Route:     &route,
 	}
 
-	b, err := json.Marshal(capsule)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(string(b))
+	/*
+		capsule string interpolation
+	*/
+	capsule = interpolateCapsuleValues(c, capsule)
 
-	//todo add err handling
+	/*
+		Dispatch capsule to subscribers
+	*/
 	response, err := DispatchCapsule(c, c.Request().Context(), capsule)
 
 	if err != nil {
+		log.Error("failed to dispatch request: %w", err)
 		return echo.NewHTTPError(http.StatusServiceUnavailable, fmt.Errorf("failed to dispatch request: %w", err).Error())
 	}
 	return c.JSON(http.StatusOK, response)
+}
+
+func interpolateCapsuleValues(c echo.Context, capsule messages.Capsule) messages.Capsule {
+
+	b, err := json.Marshal(capsule)
+	if err != nil {
+		log.Error("capsule message failed to interpolate, err: %w", err)
+	}
+	strCapsule := string(b)
+	strCapsule = interpolator.InterpolateCapsuleValues(c, capsule.Route.IndexedInterpolationValues, strCapsule)
+
+	var interpolatedCapsule messages.Capsule
+	err = json.Unmarshal([]byte(strCapsule), &interpolatedCapsule)
+	if err != nil {
+		log.Error("capsule message failed to Unmarshal, err: %w", err)
+	}
+	return interpolatedCapsule
 }
 
 func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsule) (messages.DefaultResponseMessage, error) {
@@ -72,9 +92,9 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 		directive := capsule.Route.Remote.Internal.Type
 		response := internal.Exec(capsule, directive)
 		m := messages.DefaultResponseMessage{
-			Error: false,
-			Data:  response,
-			Path:  capsule.Subject,
+			Error:     false,
+			Data:      response,
+			Selectors: capsule.Selectors,
 		}
 		return m, nil
 	}
@@ -83,9 +103,9 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 		event := capsule.Route.Remote.Webhook.Event
 		response := webhooks.Exec(capsule, event)
 		m := messages.DefaultResponseMessage{
-			Error: false,
-			Data:  response,
-			Path:  capsule.Subject,
+			Error:     false,
+			Data:      response,
+			Selectors: capsule.Selectors,
 		}
 		return m, nil
 	}
@@ -113,20 +133,8 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 	}
 
 	m := messages.DefaultResponseMessage{
-		Data: HachiContext.PublishSuccessful,
-		Path: capsule.Subject,
+		Data:      HachiContext.PublishSuccessful,
+		Selectors: capsule.Selectors,
 	}
 	return m, nil
-}
-
-//todo: interpolate route params for every field/member on our capsule (remote, subjects, headers,body, etc.)
-func InterpolateRoutingKeyFromRouteParams(c echo.Context, route config.RouteConfig) []string {
-
-	for name, pattern := range route.IndexedInterpolationValues {
-		value := c.Param(name)
-		for idx, Avalue := range route.Selectors {
-			route.Selectors[idx] = strings.TrimSpace(strings.Replace(Avalue, pattern, value, -1))
-		}
-	}
-	return route.Selectors
 }
