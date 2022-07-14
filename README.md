@@ -6,16 +6,16 @@ controller & The agents
 > hachi 八 means "Eight" or Bee in Japanese
 
 
-### <span style="background-color: #EFEFEF;color:#000;padding:0.2em">stream</span> Parameters 
- - <span style="background-color: #EFEFEF;color:green;padding:0.2em">async</span> (bool)
- - <span style="background-color: #EFEFEF;color:green;padding:0.2em">verb</span> (string)
+### stream Parameters 
+ - async (bool)
+ - verb (string)
    At this time, Hachi supports the POST and GET (static body payload) verbs
- - <span style="background-color: #EFEFEF;color:green;padding:0.2em">selectors</span> (pattern, all, dynamic)
+ - selectors (pattern, all, dynamic)
    - pattern
    - all
    - dynamic
- - <span style="background-color: #EFEFEF;color:green;padding:0.2em">async</span> (bool)
- - <span style="background-color: #EFEFEF;color:green;padding:0.2em">async</span> (bool)
+ - local (string)
+ - remote (webhook, http, ssh, broadcast)
  
 ```hcl
  stream "trigger_webhook_const_event" {
