@@ -4,10 +4,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/google/uuid"
+	"github.com/rills-ai/Hachi/pkg/integrity"
 	"os"
 	"os/signal"
-	"strings"
 	"time"
 
 	"github.com/common-nighthawk/go-figure"
@@ -88,9 +87,7 @@ func SelfProvisioning(config *config.HachiConfig) {
 	if config.Service.DNA.Controller.Enabled {
 		//todo: maybe a constant identifier
 	} else {
-		config.Service.DNA.Agent.Identifiers =
-			append(config.Service.DNA.Agent.Identifiers, fmt.Sprintf("%vRND%v", HachiContext.DefaultAgentIdentifierPrefix,
-				strings.Replace(uuid.New().String(), "-", "", -1)))
+		config.Service.DNA.Agent.Identifiers.Core = integrity.ValidateAgentID()
 	}
 }
 

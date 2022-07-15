@@ -4,14 +4,16 @@ dna "agent" {
 
   controller {
     enabled = false
-    identifiers = []
     invocation_timeout = -1
   }
 
   agent {
     //It is recommended to keep the maximum number of tokens in your subjects to a reasonable value of 16
     enabled = false
-    identifiers = []
+    identifiers {
+      core = ""
+      descriptors = []
+    }
   }
 
   nats {

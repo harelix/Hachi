@@ -4,14 +4,17 @@ dna "controller" {
 
   controller {
     enabled = true
-    identifiers = ["controller.internal", "cns.brain.frontal.broca"]
+
+    identifiers {
+      core = "controller"
+      descriptors = []
+    }
     invocation_timeout = -1
   }
 
   agent {
     //It is recommended to keep the maximum number of tokens in your subjects to a reasonable value of 16
     enabled = false
-    identifiers = []
   }
 
   nats {

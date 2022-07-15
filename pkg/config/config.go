@@ -117,13 +117,13 @@ type IAgent interface {
 	GetType() DNATypes
 	IsEnabled() bool
 	GetInvocationTimeout() int
-	GetIdentifiers() []string
+	GetIdentifiers() IdentifiersConfig
 }
 
 type controllerConfig struct {
-	Enabled           bool     `hcl:"enabled"`
-	InvocationTimeout int      `hcl:"invocation_timeout,optional"`
-	Identifiers       []string `hcl:"identifiers,optional"`
+	Enabled           bool               `hcl:"enabled"`
+	InvocationTimeout int                `hcl:"invocation_timeout,optional"`
+	Identifiers       *IdentifiersConfig `hcl:"identifiers,block"`
 }
 
 func (p controllerConfig) GetType() DNATypes {
@@ -138,14 +138,19 @@ func (p controllerConfig) GetInvocationTimeout() int {
 	return p.InvocationTimeout
 }
 
-func (p controllerConfig) GetIdentifiers() []string {
-	return p.Identifiers
+func (p controllerConfig) GetIdentifiers() IdentifiersConfig {
+	return *p.Identifiers
 }
 
 type agentConfig struct {
-	Enabled           bool     `hcl:"enabled"`
-	InvocationTimeout int      `hcl:"invocation_timeout,optional"`
-	Identifiers       []string `hcl:"identifiers,optional"`
+	Enabled           bool               `hcl:"enabled"`
+	InvocationTimeout int                `hcl:"invocation_timeout,optional"`
+	Identifiers       *IdentifiersConfig `hcl:"identifiers,block"`
+}
+
+type IdentifiersConfig struct {
+	Core        string   `hcl:"core"`
+	Descriptors []string `hcl:"descriptors"`
 }
 
 func (p agentConfig) IsEnabled() bool {
@@ -156,8 +161,8 @@ func (p agentConfig) GetInvocationTimeout() int {
 	return p.InvocationTimeout
 }
 
-func (p agentConfig) GetIdentifiers() []string {
-	return p.Identifiers
+func (p agentConfig) GetIdentifiers() IdentifiersConfig {
+	return *p.Identifiers
 }
 
 func (p agentConfig) GetType() DNATypes {

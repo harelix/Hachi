@@ -76,12 +76,12 @@ func printMsg(capsule messages.Capsule) {
 }
 
 // SubscribeToSubjects - register controller and agent to corresponding subjects
-func GetSubscriptionSubjects(config *config.HachiConfig) []string {
+func GetSubscriptionSubjects(config *config.HachiConfig) config.IdentifiersConfig {
 	dna := config.Service.DNA
 	if dna.Controller.Enabled {
 		//heartbeat edge devices registration
-		return dna.Controller.Identifiers
+		return *dna.Controller.Identifiers
 	} else {
-		return dna.Agent.Identifiers
+		return *dna.Agent.Identifiers
 	}
 }
