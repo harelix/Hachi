@@ -7,6 +7,7 @@ import (
 	"github.com/rills-ai/Hachi/pkg/api/webhooks"
 	"github.com/rills-ai/Hachi/pkg/helper"
 	"github.com/rills-ai/Hachi/pkg/internal"
+	"github.com/rills-ai/Hachi/pkg/interpolator"
 	"io"
 	"net/http"
 	"strings"
@@ -50,7 +51,8 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 		Subject: subjects,
 		Route:   &route,
 	}
-	interpolatedCapsule, err := interpolateCapsule(c, route, capsule)
+	cfg := config.New()
+	interpolatedCapsule, err := interpolateCapsule(c, route, *cfg, capsule)
 	if err != nil {
 		return err
 	}
@@ -95,25 +97,26 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 	return m, nil
 }
 
-//todo: interpolate route params for every field/member on our capsule (remote, subjects, headers,body, etc.)
-func InterpolateContent(c echo.Context, route config.RouteConfig, content string) (interpolatedContent string) {
-
+func interpolateRoute(c echo.Context, route config.RouteConfig, content string) (interpolatedRoute string) {
 	for name, pattern := range route.IndexedInterpolationValues {
 		value := c.Param(name)
-		interpolatedContent = strings.TrimSpace(strings.Replace(content, pattern, value, -1))
+		interpolatedRoute = strings.TrimSpace(strings.Replace(content, pattern, value, -1))
 	}
-
-	return interpolatedContent
+	return interpolatedRoute
 }
 
-func interpolateCapsule(c echo.Context, route config.RouteConfig, capsule messages.Capsule) (messages.Capsule, error) {
+func interpolateCapsule(c echo.Context, route config.RouteConfig, cfg config.HachiConfig, capsule messages.Capsule) (messages.Capsule, error) {
 	jsonCapsule, err := json.Marshal(capsule)
 	if err != nil {
 		return messages.Capsule{}, err
 	}
 	stringCapsule := string(jsonCapsule)
 
-	interpolatedCapsule := InterpolateContent(c, route, stringCapsule)
+	interpolatedCapsule := interpolateRoute(c, route, stringCapsule)
+	interpolatedCapsule, err = interpolator.InterpolateFromValues(cfg.Values.Values, stringCapsule)
+	if err != nil {
+		return messages.Capsule{}, err
+	}
 
 	err = json.Unmarshal([]byte(interpolatedCapsule), &capsule)
 	if err != nil {
