@@ -184,18 +184,21 @@ func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
 		return
 	}
 
-	if capsule.Route.Remote.Internal != nil {
+	fmt.Println(capsule)
+	/*
+		if capsule.Route.Remote.Internal != nil {
 
-	}
-	if capsule.Route.Remote.Webhook != nil {
+		}
+		if capsule.Route.Remote.Webhook != nil {
 
-	}
-	if capsule.Route.Remote.HTTP != nil {
+		}
+		if capsule.Route.Remote.HTTP != nil {
 
-	}
-	if capsule.Route.Remote.SSH != nil {
+		}
+		if capsule.Route.Remote.SSH != nil {
 
-	}
+		}
+	*/
 
 	//todo: tracing
 	//invoke sink/Exec
