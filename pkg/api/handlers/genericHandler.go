@@ -52,13 +52,12 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 		Route:   &route,
 	}
 	cfg := config.New()
-	interpolatedCapsule, err := interpolateCapsule(c, route, *cfg, capsule)
+	capsule, err := interpolateCapsule(c, route, *cfg, capsule)
 	if err != nil {
 		return err
 	}
-	fmt.Println(interpolatedCapsule)
 	//todo add err handling
-	response, err := DispatchCapsule(c, c.Request().Context(), interpolatedCapsule)
+	response, err := DispatchCapsule(c, c.Request().Context(), capsule)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusServiceUnavailable, fmt.Errorf("failed to dispatch request: %w", err).Error())
@@ -108,19 +107,19 @@ func interpolateRoute(c echo.Context, route config.RouteConfig, content string) 
 func interpolateCapsule(c echo.Context, route config.RouteConfig, cfg config.HachiConfig, capsule messages.Capsule) (messages.Capsule, error) {
 	jsonCapsule, err := json.Marshal(capsule)
 	if err != nil {
-		return messages.Capsule{}, err
+		return capsule, err
 	}
 	stringCapsule := string(jsonCapsule)
 
 	interpolatedCapsule := interpolateRoute(c, route, stringCapsule)
 	interpolatedCapsule, err = interpolator.InterpolateFromValues(cfg.Values.Values, stringCapsule)
 	if err != nil {
-		return messages.Capsule{}, err
+		return capsule, err
 	}
 
 	err = json.Unmarshal([]byte(interpolatedCapsule), &capsule)
 	if err != nil {
-		return messages.Capsule{}, err
+		return capsule, err
 	}
 
 	return capsule, nil
