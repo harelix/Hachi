@@ -170,7 +170,7 @@ type PublishedMessage struct {
 // handleIncomingMessage
 func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
 
-	message := pu.Message
+	message := pu.Message //NATS struct
 	//0%
 	if message == nil {
 		log.Info("Empty message recived on agent.")
@@ -184,7 +184,19 @@ func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
 		return
 	}
 
-	fmt.Println(capsule)
+	if capsule.Route.Remote.Internal != nil {
+
+	}
+	if capsule.Route.Remote.Webhook != nil {
+
+	}
+	if capsule.Route.Remote.HTTP != nil {
+
+	}
+	if capsule.Route.Remote.SSH != nil {
+
+	}
+
 	//todo: tracing
 	//invoke sink/Exec
 	e := message.Ack()
