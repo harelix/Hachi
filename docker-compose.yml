@@ -1,0 +1,55 @@
+version: '3.8'
+networks:
+  hachi:
+    driver: bridge
+
+volumes:
+  postgresql:
+  pgadmin:
+
+services:
+
+  nats:
+    image: nats:alpine
+    container_name: nats
+    networks:
+      - hachi
+    restart: always
+    command:
+      - -js
+    ports:
+      - "4222:4222"
+      - "6222:6222"
+      - "8222:8222"
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: hachi
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: postgres
+    networks:
+      - hachi
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    networks:
+      - hachi
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    restart: always
+
+    ports:
+      - "8080:80"
