@@ -10,12 +10,13 @@ volumes:
 services:
 
   nats:
-    image: nats
+    image: nats:alpine
     container_name: nats
     networks:
       - hachi
     restart: always
-
+    command:
+      - -js
     ports:
       - "4222:4222"
       - "6222:6222"
