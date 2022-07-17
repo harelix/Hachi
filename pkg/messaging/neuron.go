@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"fmt"
+	"github.com/rills-ai/Hachi/pkg/exec"
 	"github.com/rills-ai/Hachi/pkg/messaging/consumers"
 	"strconv"
 	"strings"
@@ -184,21 +185,10 @@ func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
 		return
 	}
 
-	fmt.Println(capsule)
 	/*
-		if capsule.Route.Remote.Internal != nil {
-
-		}
-		if capsule.Route.Remote.Webhook != nil {
-
-		}
-		if capsule.Route.Remote.HTTP != nil {
-
-		}
-		if capsule.Route.Remote.SSH != nil {
-
-		}
+		Processing of our incoming capsule
 	*/
+	exec.ProcessIncomingCapsule(capsule)
 
 	//todo: tracing
 	//invoke sink/Exec

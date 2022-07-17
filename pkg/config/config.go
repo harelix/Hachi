@@ -2,13 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/rills-ai/Hachi/pkg/interpolator"
-	"io/ioutil"
-	"sync"
-
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
+	"github.com/rills-ai/Hachi/pkg/interpolator"
 	"github.com/zclconf/go-cty/cty"
+	"io/ioutil"
+	"sync"
 )
 
 var once sync.Once
@@ -182,6 +181,45 @@ type RemoteExecConfig struct {
 	SSH      *SSHExecConfig  `hcl:"ssh,block"`
 	Webhook  *WebhookConfig  `hcl:"webhook,block"`
 	Internal *InternalConfig `hcl:"internal,block"`
+}
+
+type RemoteExecQualifier int
+
+const (
+	Internal RemoteExecQualifier = iota
+	Webhook
+	HTTP
+	SSH
+)
+
+func (req RemoteExecQualifier) String() string {
+	switch req {
+	case Internal:
+		return "internal"
+	case Webhook:
+		return "webhook"
+	case HTTP:
+		return "http"
+	case SSH:
+		return "ssh"
+	}
+	return "unknown"
+}
+
+func (rm *RemoteExecConfig) GetExecIdentifier() RemoteExecQualifier {
+	if rm.Internal != nil {
+		return Internal
+	}
+	if rm.Webhook != nil {
+		return Webhook
+	}
+	if rm.HTTP != nil {
+		return HTTP
+	}
+	if rm.SSH != nil {
+		return SSH
+	}
+	return -1
 }
 
 type InternalConfig struct {
