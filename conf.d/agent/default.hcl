@@ -71,5 +71,21 @@ dna "agent" {
   }
 
   #Drivers support interpreting node attributes and runtime environment
-  tracts {}
+  tracts {
+    stream "register" {
+      async = true
+      verb = "POST"
+      selectors = ["cns.brain.{{.route::lobe}}.{{.route::region}}","ORDER.cns","neurostream.controller.to.agents"]
+      local = "/cns/brain/:lobe/region/:region"
+      remote {
+        http {
+          url = "{{.remote::audio_device_addr}}/{{.local::audio_quality}}/sonant"
+        }
+      }
+      headers = {
+        "hachi-relay-x" = ["{{.remote::relay_service_addr}}", "{{.local::static_token}}"]
+        "hachi-token" = ["{{.local::static_token}}"]
+      }
+    }
+  }
 }
