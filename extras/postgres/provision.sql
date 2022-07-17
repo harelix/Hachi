@@ -33,6 +33,12 @@ ALTER TABLE IF EXISTS public.edge_registry
 
 
 INSERT INTO public.edge_registry(id, label, communication_channel, path)
-VALUES (uuid_ltree(), 'relix', 'stream.3007relix', array['root.edge.location.center','root.edge.size.medium']::ltree[]);
+VALUES (uuid_ltree(), 'tom', 'stream.tom', array['root.edge.location.ramat_gan','root.edge.size.large']::ltree[]);
 
-SELECT * FROM edge_registry WHERE path ? ARRAY['*.*.location.north','*.*.transactions.large']::lquery[];
+/*SELECT * FROM edge_registry WHERE path ? ARRAY['*.*.location.*','*.*.transactions.large']::lquery[];*/
+
+
+SELECT * FROM edge_registry
+         WHERE path ? ARRAY['*.location.*']::lquery[]
+         AND path ? ARRAY['*.large']::lquery[]
+        OR path ? ARRAY['*.sale.nothing']::lquery[]

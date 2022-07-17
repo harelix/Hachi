@@ -1,17 +1,13 @@
 package config
 
 import (
-	"errors"
 	"fmt"
+	"github.com/rills-ai/Hachi/pkg/interpolator"
 	"io/ioutil"
-	"os"
-	"regexp"
-	"strings"
 	"sync"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
-	"github.com/rills-ai/Hachi/pkg/helper"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -121,13 +117,13 @@ type IAgent interface {
 	GetType() DNATypes
 	IsEnabled() bool
 	GetInvocationTimeout() int
-	GetIdentifiers() []string
+	GetIdentifiers() IdentifiersConfig
 }
 
 type controllerConfig struct {
-	Enabled           bool     `hcl:"enabled"`
-	InvocationTimeout int      `hcl:"invocation_timeout,optional"`
-	Identifiers       []string `hcl:"identifiers,optional"`
+	Enabled           bool               `hcl:"enabled"`
+	InvocationTimeout int                `hcl:"invocation_timeout,optional"`
+	Identifiers       *IdentifiersConfig `hcl:"identifiers,block"`
 }
 
 func (p controllerConfig) GetType() DNATypes {
@@ -142,14 +138,19 @@ func (p controllerConfig) GetInvocationTimeout() int {
 	return p.InvocationTimeout
 }
 
-func (p controllerConfig) GetIdentifiers() []string {
-	return p.Identifiers
+func (p controllerConfig) GetIdentifiers() IdentifiersConfig {
+	return *p.Identifiers
 }
 
 type agentConfig struct {
-	Enabled           bool     `hcl:"enabled"`
-	InvocationTimeout int      `hcl:"invocation_timeout,optional"`
-	Identifiers       []string `hcl:"identifiers,optional"`
+	Enabled           bool               `hcl:"enabled"`
+	InvocationTimeout int                `hcl:"invocation_timeout,optional"`
+	Identifiers       *IdentifiersConfig `hcl:"identifiers,block"`
+}
+
+type IdentifiersConfig struct {
+	Core        string   `hcl:"core"`
+	Descriptors []string `hcl:"descriptors"`
 }
 
 func (p agentConfig) IsEnabled() bool {
@@ -160,8 +161,8 @@ func (p agentConfig) GetInvocationTimeout() int {
 	return p.InvocationTimeout
 }
 
-func (p agentConfig) GetIdentifiers() []string {
-	return p.Identifiers
+func (p agentConfig) GetIdentifiers() IdentifiersConfig {
+	return *p.Identifiers
 }
 
 func (p agentConfig) GetType() DNATypes {
@@ -174,18 +175,6 @@ type StorageConfig struct {
 
 type TractsConfig struct {
 	Streams []RouteConfig `hcl:"stream,block"`
-}
-
-type RouteConfig struct {
-	Async                      bool                `hcl:"async,optional"`
-	Name                       string              `hcl:"name,label"`
-	Subject                    []string            `hcl:"subject,optional"`
-	Verb                       string              `hcl:"verb"`
-	Local                      string              `hcl:"local"`
-	Remote                     RemoteExecConfig    `hcl:"remote,block"`
-	Headers                    map[string][]string `hcl:"headers,optional"`
-	IndexedInterpolationValues map[string]string
-	Payload                    string `hcl:"payload,optional"`
 }
 
 type RemoteExecConfig struct {
@@ -258,13 +247,15 @@ func (config *HachiConfig) ParseFile(filePath string) error {
 		},
 	}
 
+	//init interpolation values from Stanza and Envars
+	interpolator.InitInterpolationValues(config.Values.Values)
 	//main configuration file parsing
 	config.rawConfigValue, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to read file: %w", err)
 	}
 	baseConfigContent := string(config.rawConfigValue)
-	bc, err := config.InterpolateStrings(baseConfigContent)
+	bc, err := interpolator.InterpolateStrings(baseConfigContent)
 	if err != nil {
 		return fmt.Errorf("failed to interpolate config: %w", err)
 	}
@@ -275,7 +266,7 @@ func (config *HachiConfig) ParseFile(filePath string) error {
 		return fmt.Errorf("failed to read file: %w", err)
 	}
 	internalConfigContent := string(config.internalTractsConfig)
-	ic, err := config.InterpolateStrings(internalConfigContent)
+	ic, err := interpolator.InterpolateStrings(internalConfigContent)
 	if err != nil {
 		return fmt.Errorf("failed to interpolate config: %w", err)
 	}
@@ -317,6 +308,7 @@ func (config *HachiConfig) LoadStanzaValues(filePath string) error {
 	return nil
 }
 
+/*
 var InterpolationRegex = regexp.MustCompile("{{\\.((local|remote|route|resolver)::(.*?))}}")
 
 // InterpolateStrings  we currently support interpolation from envars and Hachi stanza vars
@@ -356,3 +348,4 @@ func (config *HachiConfig) InterpolateStrings(content string) (string, error) {
 	}
 	return content, nil
 }
+*/

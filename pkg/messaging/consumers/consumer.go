@@ -57,31 +57,31 @@ func ProcessIncomingCapsule(ctx context.Context, ch chan messages.Capsule, capsu
 	printMsg(capsule)
 
 	ch <- messages.Capsule{
-		Message: "OK",
-		Headers: nil,
-		Subject: nil,
-		Route:   nil,
+		Message:   "OK",
+		Headers:   nil,
+		Selectors: nil,
+		Route:     nil,
 	}
 
 	ch <- messages.Capsule{
-		Message: "AOK",
-		Headers: nil,
-		Subject: nil,
-		Route:   nil,
+		Message:   "AOK",
+		Headers:   nil,
+		Selectors: nil,
+		Route:     nil,
 	}
 }
 
 func printMsg(capsule messages.Capsule) {
-	log.Printf("Received on [%s]: '%s', '%s'", capsule.Subject, string(capsule.Route.Name), capsule.Message)
+	log.Printf("Received on [%s]: '%s', '%s'", capsule.Selectors, string(capsule.Route.Name), capsule.Message)
 }
 
 // SubscribeToSubjects - register controller and agent to corresponding subjects
-func GetSubscriptionSubjects(config *config.HachiConfig) []string {
+func GetSubscriptionSubjects(config *config.HachiConfig) config.IdentifiersConfig {
 	dna := config.Service.DNA
 	if dna.Controller.Enabled {
 		//heartbeat edge devices registration
-		return dna.Controller.Identifiers
+		return *dna.Controller.Identifiers
 	} else {
-		return dna.Agent.Identifiers
+		return *dna.Agent.Identifiers
 	}
 }

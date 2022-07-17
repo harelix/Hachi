@@ -4,7 +4,7 @@ dna "internals" {
     stream "webhook_registration_endpoint" {
       async = true
       verb = "POST"
-      subject = [""]
+      selectors = []
       local = "/webhooks/:client"
       remote {
         webhook {
@@ -29,24 +29,24 @@ dna "internals" {
 
     stream "encrypt" {
       async   = false
-      subject = ["__internal__.crypto.encrypt#selector"]
+      selectors = []
       verb    = "POST"
       local   = "/hrl/encrypt"
       remote {
         internal {
-          directive = "encrypt"
+          directive = "__internal__.crypto.encrypt#selector"
         }
       }
     }
 
     stream "decrypt" {
       async   = false
-      subject = ["__internal__.crypto.decrypt#selector"]
+      selectors = []
       verb    = "POST"
       local   = "/hrl/decrypt"
       remote {
         internal {
-          directive = "decrypt"
+          directive = "__internal__.crypto.decrypt#selector"
         }
       }
     }

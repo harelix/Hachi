@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/rills-ai/Hachi/pkg/integrity"
 	"os"
 	"os/signal"
 	"time"
@@ -55,6 +56,8 @@ func main() {
 		log.Printf(err.Error())
 		os.Exit(1)
 	}
+
+	SelfProvisioning(config.New())
 	//config main service context
 	ctx, cancel := context.WithCancel(context.WithValue(context.Background(),
 		HachiContext.ContextIAM, config.New().IAM))
@@ -62,6 +65,7 @@ func main() {
 
 	//bootstrap server
 	go api.StartAPIServer(ctx)
+
 	//init Hachi Neuron
 	err = messaging.Get().Init(ctx)
 	if err != nil {
@@ -77,6 +81,14 @@ func main() {
 	<-quit
 	messaging.Get().Close()
 	ctx.Done()
+}
+
+func SelfProvisioning(config *config.HachiConfig) {
+	if config.Service.DNA.Controller.Enabled {
+		//todo: maybe a constant identifier
+	} else {
+		config.Service.DNA.Agent.Identifiers.Core = integrity.ValidateAgentID()
+	}
 }
 
 func PrintHachiWelcome() {

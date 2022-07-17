@@ -2,25 +2,26 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/rills-ai/Hachi/pkg/api/webhooks"
-	"github.com/rills-ai/Hachi/pkg/helper"
-	"github.com/rills-ai/Hachi/pkg/internal"
-	"io"
-	"net/http"
-	"strings"
-
 	"github.com/labstack/echo/v4"
 	HachiContext "github.com/rills-ai/Hachi/pkg"
 	"github.com/rills-ai/Hachi/pkg/config"
+	"github.com/rills-ai/Hachi/pkg/internal"
+	"github.com/rills-ai/Hachi/pkg/interpolator"
 	"github.com/rills-ai/Hachi/pkg/messages"
 	"github.com/rills-ai/Hachi/pkg/messaging"
+	"github.com/rills-ai/Hachi/pkg/webhooks"
+	log "github.com/sirupsen/logrus"
+	"io"
+	"net/http"
+	"strings"
 )
 
 func GenericHandler(c echo.Context, route config.RouteConfig) error {
 
-	webhooks.Construct().Notify("Yay!")
-	subjects := InterpolateRoutingKeyFromRouteParams(c, route)
+	//webhooks.Construct().Notify("Yay!")
+	selectors := route.Selectors
 	headers := c.Request().Header
 	body := route.Payload
 
@@ -43,30 +44,117 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 	}
 
 	capsule := messages.Capsule{
-		Message: body,
-		Headers: headers,
-		Subject: subjects,
-		Route:   &route,
+		Message:   body,
+		Headers:   headers,
+		Selectors: selectors,
+		Route:     &route,
 	}
 
-	//todo add err handling
+	/*
+		capsule string interpolation
+	*/
+	capsule = interpolateCapsuleValues(c, capsule)
+
+	/*
+			======================================================
+			Dispatch capsule to subscribers
+		    ======================================================
+	*/
 	response, err := DispatchCapsule(c, c.Request().Context(), capsule)
 
 	if err != nil {
+		log.Error("failed to dispatch request: %w", err)
 		return echo.NewHTTPError(http.StatusServiceUnavailable, fmt.Errorf("failed to dispatch request: %w", err).Error())
 	}
 	return c.JSON(http.StatusOK, response)
 }
 
-func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsule) (map[string]any, error) {
+func interpolateCapsuleValues(c echo.Context, capsule messages.Capsule) messages.Capsule {
+
+	marshaledCapsule, err := json.Marshal(capsule)
+	if err != nil {
+		log.Error("capsule message failed to interpolate, err: %w", err)
+	}
+	capsuleString := string(marshaledCapsule)
+
+	//convert route/path params to map
+	var pathParamsDictionary = convertPathParamsToMap(c)
+
+	//generic capsule interpolation method
+	capsuleString, err = interpolator.InterpolateCapsuleValues(pathParamsDictionary,
+		capsule.Route.IndexedInterpolationValues, capsuleString, true)
+
+	if err != nil {
+		log.Warning("capsule interpolation failed with err: %w", err)
+	}
+
+	var interpolatedCapsule messages.Capsule
+	err = json.Unmarshal([]byte(capsuleString), &interpolatedCapsule)
+
+	if err != nil {
+		log.Warning("capsule message failed to Unmarshal, err: %w", err)
+	}
+	return interpolatedCapsule
+}
+
+func convertPathParamsToMap(c echo.Context) map[string]string {
+
+	var pathParams = make(map[string]string)
+	var pNames = c.ParamNames()
+
+	for i := 0; i < len(pNames); i++ {
+		pathParams[pNames[i]] = c.ParamValues()[i]
+	}
+	return pathParams
+}
+
+func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsule) (messages.DefaultResponseMessage, error) {
 
 	//remove internal instruction and handle a message by its remote sub-type!!!!!
 	//checks for an internal instruction
-	directive := helper.CollectionFunc[string](capsule.Subject,
-		func(value string) bool {
-			return strings.Contains(value, "__internal__")
-		})
+	if capsule.Route.Remote.Internal != nil {
+		directive := capsule.Route.Remote.Internal.Type
+		response := internal.Exec(capsule, directive)
+		m := messages.DefaultResponseMessage{
+			Error:     false,
+			Data:      response,
+			Selectors: capsule.Selectors,
+		}
+		return m, nil
+	}
 
+	if capsule.Route.Remote.Webhook != nil {
+		event := capsule.Route.Remote.Webhook.Event
+		response := webhooks.Exec(capsule, event)
+		m := messages.DefaultResponseMessage{
+			Error:     false,
+			Data:      response,
+			Selectors: capsule.Selectors,
+		}
+		return m, nil
+	}
+
+	//main message/action relay/execution
+	err := messaging.Get().Publish(ctx, capsule)
+
+	if err != nil {
+		return messages.DefaultResponseMessage{
+			Error: true,
+		}, err
+	}
+
+	m := messages.DefaultResponseMessage{
+		Data:      HachiContext.PublishSuccessful,
+		Selectors: capsule.Selectors,
+	}
+	return m, nil
+}
+
+/*
+		directive := helper.CollectionFunc[string](capsule.Subject,
+			func(value string) bool {
+				return strings.Contains(value, "__internal__")
+			})
 	if directive != "" {
 		//internal actions execution
 		response := internal.Exec(capsule, directive)
@@ -76,27 +164,4 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 		}
 		return m, nil
 	}
-
-	//main message/action relay/execution
-	err := messaging.Get().Publish(ctx, capsule)
-	if err != nil {
-		return nil, err
-	}
-	m := map[string]any{
-		"data": HachiContext.PublishSuccessful,
-		"path": capsule.Subject,
-	}
-	return m, nil
-}
-
-//todo: interpolate route params for every field/member on our capsule (remote, subjects, headers,body, etc.)
-func InterpolateRoutingKeyFromRouteParams(c echo.Context, route config.RouteConfig) []string {
-
-	for name, pattern := range route.IndexedInterpolationValues {
-		value := c.Param(name)
-		for idx, Avalue := range route.Subject {
-			route.Subject[idx] = strings.TrimSpace(strings.Replace(Avalue, pattern, value, -1))
-		}
-	}
-	return route.Subject
-}
+*/

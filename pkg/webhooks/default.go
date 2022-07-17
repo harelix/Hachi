@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/rills-ai/Hachi/pkg/api/helpers"
+	"github.com/rills-ai/Hachi/pkg/messages"
 	"net/http"
 	"sync"
 	"time"
@@ -78,6 +79,18 @@ func (d *Dispatcher) bindDefaultWebhook() {
 		}
 		return c.JSON(http.StatusOK, registerResponse)
 	})
+}
+
+func Exec(capsule messages.Capsule, event string) WebhookResponse {
+	return WebhookResponse{
+		Result: "",
+		Event:  event,
+	}
+}
+
+type WebhookResponse struct {
+	Result string
+	Event  string
 }
 
 func (d *Dispatcher) hookDispatchChannel() {
