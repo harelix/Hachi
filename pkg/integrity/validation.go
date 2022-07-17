@@ -20,9 +20,10 @@ const AUTHENTICITY_TOKEN string = "Hachi::"
 
 func ProvisionAgentID() string {
 
-	id := AUTHENTICITY_TOKEN + "rlx" + strings.Replace(uuid.New().String(), "-", "", -1) + ":" + strconv.FormatInt(time.Now().Unix(), 10)
+	id := AUTHENTICITY_TOKEN + "rlx_th" + strings.Replace(uuid.New().String(), "-", "", -1) + ":" + strconv.FormatInt(time.Now().Unix(), 10)
 	encryptedID := cryptography.Encryption(id)
 	base64Id := base64.StdEncoding.EncodeToString([]byte(encryptedID))
+	//todo: add env perm (0600)
 	err := ioutil.WriteFile(DAT_FILE, []byte(base64Id), 0644)
 	if err != nil {
 		log.Fatal("Can not create DAT FILE", err)

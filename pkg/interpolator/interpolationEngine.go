@@ -69,7 +69,7 @@ func InterpolateCapsuleValues(values map[string]string, interpolationValues map[
 	}
 	content, err := InterpolateStrings(content)
 	if err != nil {
-		log.Error("capsule message failed to interpolate, err: %w", err)
+		log.Warning("capsule message failed to interpolate, err: %w", err)
 		return content, err
 	}
 	return content, nil
