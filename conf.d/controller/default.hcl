@@ -122,7 +122,7 @@ dna "controller" {
       local = "/test"
       remote {
         http {
-          url = "{{.remote::service_addr}}/"
+          url = "{{.remote::core_service_addr}}/some_rpc_method/{{.remote::default_server_port}}"
         }
       }
       headers = {

@@ -56,7 +56,9 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 	capsule = interpolateCapsuleValues(c, capsule)
 
 	/*
-		Dispatch capsule to subscribers
+			======================================================
+			Dispatch capsule to subscribers
+		    ======================================================
 	*/
 	response, err := DispatchCapsule(c, c.Request().Context(), capsule)
 
@@ -75,9 +77,13 @@ func interpolateCapsuleValues(c echo.Context, capsule messages.Capsule) messages
 	}
 	capsuleString := string(marshaledCapsule)
 
+	//convert route/path params to map
 	var pathParamsDictionary = convertPathParamsToMap(c)
 
-	capsuleString, err = interpolator.InterpolateCapsuleValues(pathParamsDictionary, capsule.Route.IndexedInterpolationValues, capsuleString, true)
+	//generic capsule interpolation method
+	capsuleString, err = interpolator.InterpolateCapsuleValues(pathParamsDictionary,
+		capsule.Route.IndexedInterpolationValues, capsuleString, true)
+
 	if err != nil {
 		log.Warning("capsule interpolation failed with err: %w", err)
 	}
@@ -127,23 +133,10 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 		}
 		return m, nil
 	}
-	/*
-			directive := helper.CollectionFunc[string](capsule.Subject,
-				func(value string) bool {
-					return strings.Contains(value, "__internal__")
-				})
-		if directive != "" {
-			//internal actions execution
-			response := internal.Exec(capsule, directive)
-			m := map[string]any{
-				"data": response,
-				"path": capsule.Subject,
-			}
-			return m, nil
-		}
-	*/
+
 	//main message/action relay/execution
 	err := messaging.Get().Publish(ctx, capsule)
+
 	if err != nil {
 		return messages.DefaultResponseMessage{
 			Error: true,
@@ -156,3 +149,19 @@ func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsu
 	}
 	return m, nil
 }
+
+/*
+		directive := helper.CollectionFunc[string](capsule.Subject,
+			func(value string) bool {
+				return strings.Contains(value, "__internal__")
+			})
+	if directive != "" {
+		//internal actions execution
+		response := internal.Exec(capsule, directive)
+		m := map[string]any{
+			"data": response,
+			"path": capsule.Subject,
+		}
+		return m, nil
+	}
+*/
