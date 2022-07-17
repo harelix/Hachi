@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	HachiContext "github.com/rills-ai/Hachi/pkg"
@@ -50,6 +49,7 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 		Route:     &route,
 	}
 
+	fmt.Println(capsule.JSONFRomCapsule())
 	/*
 		capsule string interpolation
 	*/
@@ -69,13 +69,16 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+//tod: error handling
 func interpolateCapsuleValues(c echo.Context, capsule messages.Capsule) messages.Capsule {
 
-	marshaledCapsule, err := json.Marshal(capsule)
+	capsuleString, err := capsule.JSONFRomCapsule()
+
 	if err != nil {
 		log.Error("capsule message failed to interpolate, err: %w", err)
+		//tod: error handling
+		return capsule
 	}
-	capsuleString := string(marshaledCapsule)
 
 	//convert route/path params to map
 	var pathParamsDictionary = convertPathParamsToMap(c)
@@ -88,11 +91,12 @@ func interpolateCapsuleValues(c echo.Context, capsule messages.Capsule) messages
 		log.Warning("capsule interpolation failed with err: %w", err)
 	}
 
-	var interpolatedCapsule messages.Capsule
-	err = json.Unmarshal([]byte(capsuleString), &interpolatedCapsule)
+	interpolatedCapsule, err := messages.CapsuleFromJSON(capsuleString)
 
 	if err != nil {
 		log.Warning("capsule message failed to Unmarshal, err: %w", err)
+		//todo: handle
+		return capsule
 	}
 	return interpolatedCapsule
 }

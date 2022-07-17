@@ -167,27 +167,30 @@ type PublishedMessage struct {
 	Error   error
 }
 
+// handleIncomingMessage
 func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
+
 	message := pu.Message
+	//0%
 	if message == nil {
+		log.Info("Empty message recived on agent.")
+	}
+
+	capsule, err := messages.CapsuleFromJSON(string(message.Data))
+	if err != nil {
+		log.Error("Capsule could not be unmarshaled from JSON.")
+		//todo: handle?????
+		//call a specific nil message handler
 		return
 	}
-	fmt.Println(message.Data)
 
-	//Http Dispatch storix
-	/*tracing.Trace(tracing.HachiContext{
-		Method:      "",
-		Path:        "",
-		Resource:    "",
-		ServiceName: "",
-		ServiceType: "",
-	})*/
-	//invokeSink/Exec
+	fmt.Println(capsule)
+	//todo: tracing
+	//invoke sink/Exec
 	e := message.Ack()
 	if e != nil {
 		println("bind default pull subscriber: %w", e)
 	}
-
 }
 
 /*

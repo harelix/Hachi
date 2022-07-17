@@ -38,7 +38,7 @@ controller & The agents
 
 Secure, Performant, Agile, Resilient
 
-With reliable backbone services (NATS, Kafka*, Rabbit*), adaptive communication channels (personal and public), and leaf nodes customization, optimize communications for various invokation scenarios.
+With reliable backbone services (NATS, Kafka*, Rabbit*), adaptive communication channels (personal and public), and leaf nodes customization, optimize communications for various invocation scenarios.
 Hachi's Adaptive mesh Architecture allows for a perfect fit for unique needs to introduce and activate devices, edge, cloud, or hybrid deployments.
 
 Hachi with its underlying backbone supports true multi-tenancy, securely isolate and share data. 
@@ -126,7 +126,7 @@ MaxDeliver - Some messages may cause your applications to crash and cause a neve
 1. values/envars - deployment time interpolation
 {{.interpolated_key}}
 
-2. api invokation value - RPC execution time
+2. api invocation value - RPC execution time
 {{.api.interpolated_key}}
 
    
@@ -134,7 +134,7 @@ for instance;
     /api/${api_version}/method
     on system start apoi_version value will be interpolated into the base url
 
-{{.value}} = these values will always be interpolated on API invokation from dynamic value sent to the url
+{{.value}} = these values will always be interpolated on API invocation from dynamic value sent to the url
 
 Helper methods on Server
 
