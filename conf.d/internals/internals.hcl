@@ -1,5 +1,16 @@
 dna "internals" {
   tracts {
+
+    /*
+    stream "agent_first_time_register" {
+      async = false
+      verb = "POST"
+      selectors = []
+      local = "/internal/id/:agent_id"
+      remote {  internal {}  }
+    }
+    */
+
     //static event from configuration
     stream "webhook_registration_endpoint" {
       async = true
