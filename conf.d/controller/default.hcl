@@ -78,10 +78,10 @@ dna "controller" {
       async = true
       verb = "POST"
       selectors = ["stations.>.{{.route::type}}", "agent.internal.>"]
-      local = "/metrics/type/:type"
+      local = "/metrics/type/:type/filter/:filter"
       remote {
         http {
-          url = "metrics_service.remote_server:8080/metrics/{{.route::type}}"
+          url = "metrics_service.remote_server:8080/metrics/{{.route::type}}/{{.route::filter}}"
         }
       }
       headers = {

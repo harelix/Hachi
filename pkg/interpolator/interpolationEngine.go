@@ -2,7 +2,6 @@ package interpolator
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"github.com/rills-ai/Hachi/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -57,16 +56,21 @@ func InterpolateStrings(content string) (string, error) {
 	return content, nil
 }
 
-func InterpolateCapsuleValues(c echo.Context, InterpolationValues map[string]string, content string) string {
+func InterpolateCapsuleValues(values map[string]string, interpolationValues map[string]string, content string, interpolateLocals bool) (string, error) {
 
-	for name, pattern := range InterpolationValues {
-		value := c.Param(name)
-		content = strings.Replace(content, pattern, value, -1)
+	for name, pattern := range interpolationValues {
+		if val, ok := values[name]; ok {
+			content = strings.Replace(content, pattern, val, -1)
+		}
 	}
 
+	if !interpolateLocals {
+		return content, nil
+	}
 	content, err := InterpolateStrings(content)
 	if err != nil {
 		log.Error("capsule message failed to interpolate, err: %w", err)
+		return content, err
 	}
-	return content
+	return content, nil
 }

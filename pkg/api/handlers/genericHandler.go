@@ -69,19 +69,37 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 
 func interpolateCapsuleValues(c echo.Context, capsule messages.Capsule) messages.Capsule {
 
-	b, err := json.Marshal(capsule)
+	marshaledCapsule, err := json.Marshal(capsule)
 	if err != nil {
 		log.Error("capsule message failed to interpolate, err: %w", err)
 	}
-	strCapsule := string(b)
-	strCapsule = interpolator.InterpolateCapsuleValues(c, capsule.Route.IndexedInterpolationValues, strCapsule)
+	capsuleString := string(marshaledCapsule)
+
+	var pathParamsDictionary = convertPathParamsToMap(c)
+
+	capsuleString, err = interpolator.InterpolateCapsuleValues(pathParamsDictionary, capsule.Route.IndexedInterpolationValues, capsuleString, true)
+	if err != nil {
+		log.Warning("capsule interpolation failed with err: %w", err)
+	}
 
 	var interpolatedCapsule messages.Capsule
-	err = json.Unmarshal([]byte(strCapsule), &interpolatedCapsule)
+	err = json.Unmarshal([]byte(capsuleString), &interpolatedCapsule)
+
 	if err != nil {
-		log.Error("capsule message failed to Unmarshal, err: %w", err)
+		log.Warning("capsule message failed to Unmarshal, err: %w", err)
 	}
 	return interpolatedCapsule
+}
+
+func convertPathParamsToMap(c echo.Context) map[string]string {
+
+	var pathParams = make(map[string]string)
+	var pNames = c.ParamNames()
+
+	for i := 0; i < len(pNames); i++ {
+		pathParams[pNames[i]] = c.ParamValues()[i]
+	}
+	return pathParams
 }
 
 func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsule) (messages.DefaultResponseMessage, error) {
