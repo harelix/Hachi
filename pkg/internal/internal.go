@@ -9,7 +9,6 @@ import (
 	"github.com/rills-ai/Hachi/pkg/controller"
 	"github.com/rills-ai/Hachi/pkg/cryptography"
 	"github.com/rills-ai/Hachi/pkg/messages"
-	"github.com/rills-ai/Hachi/pkg/messaging"
 	"github.com/rills-ai/Hachi/pkg/webhooks"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -68,11 +67,7 @@ func ProcessCapsule(ctx context.Context, capsule messages.Capsule) (messages.Def
 	return responseMessage, nil
 }
 
-[A/C]
-->API->Handler->Dispatch->NATS->Subscriber->Exec(Sinks)->Response->NATS->Subscriber->Confirmation
-
-
-func DispatchCapsuleToMessageQueueSubscribers(ctx context.Context, capsule messages.Capsule) (messages.DefaultResponseMessage, error ) {
+func DispatchCapsuleToMessageQueueSubscribers(ctx context.Context, capsule messages.Capsule) (messages.DefaultResponseMessage, error) {
 
 	switch config.New().IAM.GetType() {
 	case config.Controller:
@@ -87,7 +82,6 @@ func DispatchCapsuleToMessageQueueSubscribers(ctx context.Context, capsule messa
 	log.Trace("this should not happen, service without valid IAM configuration.")
 	return messages.DefaultResponseMessage{}, nil
 }
-
 
 func internals(capsule messages.Capsule, directive string) InternalResponse {
 	args := strings.Split(directive, "#")
