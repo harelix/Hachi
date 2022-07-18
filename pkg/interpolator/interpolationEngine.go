@@ -59,9 +59,7 @@ func InterpolateStrings(content string) (string, error) {
 func InterpolateCapsuleValues(values map[string]string, interpolationValues map[string]string, content string, interpolateLocals bool) (string, error) {
 
 	for name, pattern := range values {
-		if val, ok := values[name]; ok {
-			content = strings.Replace(content, pattern, val, -1)
-		}
+		content = strings.Replace(content, "{{.route::"+name+"}}", pattern, -1)
 	}
 
 	if !interpolateLocals {

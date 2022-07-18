@@ -100,8 +100,8 @@ func SelfProvisioning(config *config.HachiConfig) {
 
 func PrintHachiWelcome() {
 	time.Sleep(50 * time.Millisecond)
-	myFigure := figure.NewFigure("8//Hachi", "doom", true)
+	myFigure := figure.NewFigure("8//Hachi ["+config.New().Service.Type.String()+"]", "doom", true)
 	myFigure.Print()
-	message := fmt.Sprintf("\nHachi@Relix, instance name '%s', version %d", config.New().Service.DNA.Name, config.New().Service.Version)
+	message := fmt.Sprintf("\nHachi@Relix, instance name: '%s', agent type: %v, version: %d", config.New().Service.DNA.Name, config.New().Service.Type.String(), config.New().Service.Version)
 	fmt.Println(message)
 }
