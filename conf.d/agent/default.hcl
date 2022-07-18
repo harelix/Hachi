@@ -9,7 +9,7 @@ dna "agent" {
 
   agent {
     //It is recommended to keep the maximum number of tokens in your subjects to a reasonable value of 16
-    enabled = false
+    enabled = true
     identifiers {
       core = ""
       descriptors = ["stations", "north", "galil" , "large", "happy", "mobile"]

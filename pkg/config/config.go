@@ -1,10 +1,12 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/rills-ai/Hachi/pkg/interpolator"
+	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"io/ioutil"
 	"sync"
@@ -72,7 +74,7 @@ type DNAConfig struct {
 	Name           string            `hcl:"name,label"`
 	API            APIConfig         `hcl:"api,block"`
 	Controller     *controllerConfig `hcl:"controller,block"`
-	Agent          *agentConfig      `hcl:"agent,block"`
+	Agent          *AgentConfig      `hcl:"agent,block"`
 	Storage        StorageConfig     `hcl:"storage,block"`
 	Tracts         TractsConfig      `hcl:"tracts,block"`
 	Stream         StreamConfig      `hcl:"stream,block"`
@@ -141,31 +143,55 @@ func (p controllerConfig) GetIdentifiers() IdentifiersConfig {
 	return *p.Identifiers
 }
 
-type agentConfig struct {
-	Enabled           bool               `hcl:"enabled"`
-	InvocationTimeout int                `hcl:"invocation_timeout,optional"`
-	Identifiers       *IdentifiersConfig `hcl:"identifiers,block"`
+type AgentConfig struct {
+	Enabled           bool               `json:"enabled" hcl:"enabled"`
+	InvocationTimeout int                `json:"invocation_timeout" hcl:"invocation_timeout,optional"`
+	Identifiers       *IdentifiersConfig `json:"identifiers" hcl:"identifiers,block"`
+	VerifiedOn        string             `json:"verified_on"` //last timestamp this agent was verified
+	Verified          bool               `json:"verified"`    //was verified by controller
 }
 
 type IdentifiersConfig struct {
-	Core        string   `hcl:"core"`
-	Descriptors []string `hcl:"descriptors"`
+	Core        string   `json:"core" hcl:"core"`
+	Descriptors []string `json:"descriptors" hcl:"descriptors"`
 }
 
-func (p agentConfig) IsEnabled() bool {
+func (p AgentConfig) IsEnabled() bool {
 	return p.Enabled
 }
 
-func (p agentConfig) GetInvocationTimeout() int {
+func (p AgentConfig) GetInvocationTimeout() int {
 	return p.InvocationTimeout
 }
 
-func (p agentConfig) GetIdentifiers() IdentifiersConfig {
+func (p AgentConfig) GetIdentifiers() IdentifiersConfig {
 	return *p.Identifiers
 }
 
-func (p agentConfig) GetType() DNATypes {
+func (p AgentConfig) GetType() DNATypes {
 	return Agent
+}
+
+func AgentConfigFromJSON(content string) (AgentConfig, error) {
+	var interpolatedAgentCfg AgentConfig
+	err := json.Unmarshal([]byte(content), &interpolatedAgentCfg)
+
+	if err != nil {
+		log.Warning("agent config message failed to Unmarshal, err: %w", err)
+		return AgentConfig{}, err
+	}
+	return interpolatedAgentCfg, nil
+}
+
+func (ac *AgentConfig) ToJSON() (string, error) {
+
+	marshaledac, err := json.Marshal(ac)
+	if err != nil {
+		log.Error("agent config message failed to interpolate, err: %w", err)
+		return "", err
+	}
+	acString := string(marshaledac)
+	return acString, nil
 }
 
 type StorageConfig struct {
