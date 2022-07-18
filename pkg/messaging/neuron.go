@@ -230,12 +230,12 @@ func (hn *HachiNeuron) Subscribe(subjects []string) error {
 	return nil
 }
 
-func (hn *HachiNeuron) Publish(ctx context.Context, capsule messages.Capsule) error {
+func (hn *HachiNeuron) Publish(ctx context.Context, capsule messages.Capsule, selectors []string) error {
 	msg, err := json.Marshal(capsule)
 	if err != nil {
 		return err
 	}
-	for _, subject := range capsule.Selectors {
+	for _, subject := range selectors {
 		err = hn.NC.Publish(subject, []byte(msg))
 		return err
 	}

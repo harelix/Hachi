@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/rills-ai/Hachi/pkg/integrity"
+	"golang.org/x/exp/rand"
 	"os"
 	"os/signal"
 	"time"
@@ -16,6 +17,16 @@ import (
 	"github.com/rills-ai/Hachi/pkg/messaging"
 	log "github.com/sirupsen/logrus"
 )
+
+func GenerateMockDataset() {
+
+	for i := 0; i < 100; i++ {
+		randTags := rand.Intn(30000)
+		for i := 0; i < randTags; i++ {
+
+		}
+	}
+}
 
 func init() {
 	// Log as JSON instead of the default ASCII formatter.
@@ -29,8 +40,9 @@ func init() {
 
 func main() {
 	log.SetReportCaller(true)
-
 	go PrintHachiWelcome()
+
+	GenerateMockDataset()
 
 	var confile = flag.String("config", "", "default configuration file path")
 	var valfile = flag.String("values", "", "default values file path")

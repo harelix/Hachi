@@ -12,7 +12,7 @@ dna "agent" {
     enabled = false
     identifiers {
       core = ""
-      descriptors = []
+      descriptors = ["stations", "north", "galil" , "large", "happy", "mobile"]
     }
   }
 
@@ -75,7 +75,7 @@ dna "agent" {
     stream "register" {
       async = true
       verb = "POST"
-      selectors = ["cns.brain.{{.route::lobe}}.{{.route::region}}","ORDER.cns","neurostream.controller.to.agents"]
+      selectors = ["neurostream.controller.to.agents"]
       local = "/cns/brain/:lobe/region/:region"
       remote {
         http {

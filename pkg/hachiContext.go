@@ -3,6 +3,10 @@ package HachiContext
 import "errors"
 
 const (
+	//internal actions
+	InternalsCryptoEncrypt string = "__internal__.crypto.encrypt"
+	InternalsCryptoDecrypt string = "__internal__.crypto.decrypt"
+
 	//auto-heal
 	ConnectingToServerIntervalInSeconds int64  = 5
 	MaxReconnectAttemptsToServer        int    = 5

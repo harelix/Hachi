@@ -9,8 +9,6 @@ import (
 	"github.com/rills-ai/Hachi/pkg/internal"
 	"github.com/rills-ai/Hachi/pkg/interpolator"
 	"github.com/rills-ai/Hachi/pkg/messages"
-	"github.com/rills-ai/Hachi/pkg/messaging"
-	"github.com/rills-ai/Hachi/pkg/webhooks"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -19,7 +17,11 @@ import (
 
 func GenericHandler(c echo.Context, route config.RouteConfig) error {
 
-	//webhooks.Construct().Notify("Yay!")
+	//cfg := config.New()
+	//todo: future task
+	//cfg.Service.DNA.Stream.CircuitBreaker.Enabled
+	//cfg.Service.DNA.Stream.Deduping.Enabled
+
 	selectors := route.Selectors
 	headers := c.Request().Header
 	body := route.Payload
@@ -49,7 +51,7 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 		Route:     &route,
 	}
 
-	fmt.Println(capsule.JSONFRomCapsule())
+	//fmt.Println(capsule.JSONFRomCapsule())
 	/*
 		capsule string interpolation
 	*/
@@ -113,45 +115,21 @@ func convertPathParamsToMap(c echo.Context) map[string]string {
 }
 
 func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsule) (messages.DefaultResponseMessage, error) {
-
-	//remove internal instruction and handle a message by its remote sub-type!!!!!
-	//checks for an internal instruction
-	if capsule.Route.Remote.Internal != nil {
-		directive := capsule.Route.Remote.Internal.Type
-		response := internal.Exec(capsule, directive)
-		m := messages.DefaultResponseMessage{
-			Error:     false,
-			Data:      response,
-			Selectors: capsule.Selectors,
-		}
-		return m, nil
-	}
-
-	if capsule.Route.Remote.Webhook != nil {
-		event := capsule.Route.Remote.Webhook.Event
-		response := webhooks.Exec(capsule, event)
-		m := messages.DefaultResponseMessage{
-			Error:     false,
-			Data:      response,
-			Selectors: capsule.Selectors,
-		}
-		return m, nil
-	}
-
-	//main message/action relay/execution
-	err := messaging.Get().Publish(ctx, capsule)
-
+	//todo: implement Sync behaviour
+	response, err := internal.ProcessCapsule(ctx, capsule)
 	if err != nil {
 		return messages.DefaultResponseMessage{
 			Error: true,
 		}, err
 	}
+	fmt.Println(response)
 
 	m := messages.DefaultResponseMessage{
 		Data:      HachiContext.PublishSuccessful,
 		Selectors: capsule.Selectors,
 	}
 	return m, nil
+
 }
 
 /*
