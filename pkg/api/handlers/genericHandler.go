@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	HachiContext "github.com/rills-ai/Hachi/pkg"
@@ -10,8 +9,6 @@ import (
 	"github.com/rills-ai/Hachi/pkg/internal"
 	"github.com/rills-ai/Hachi/pkg/interpolator"
 	"github.com/rills-ai/Hachi/pkg/messages"
-	"github.com/rills-ai/Hachi/pkg/messaging"
-	"github.com/rills-ai/Hachi/pkg/webhooks"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -20,7 +17,11 @@ import (
 
 func GenericHandler(c echo.Context, route config.RouteConfig) error {
 
-	//webhooks.Construct().Notify("Yay!")
+	//cfg := config.New()
+	//todo: future task
+	//cfg.Service.DNA.Stream.CircuitBreaker.Enabled
+	//cfg.Service.DNA.Stream.Deduping.Enabled
+
 	selectors := route.Selectors
 	headers := c.Request().Header
 	body := route.Payload
@@ -50,6 +51,7 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 		Route:     &route,
 	}
 
+	//fmt.Println(capsule.JSONFRomCapsule())
 	/*
 		capsule string interpolation
 	*/
@@ -69,13 +71,16 @@ func GenericHandler(c echo.Context, route config.RouteConfig) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+//tod: error handling
 func interpolateCapsuleValues(c echo.Context, capsule messages.Capsule) messages.Capsule {
 
-	marshaledCapsule, err := json.Marshal(capsule)
+	capsuleString, err := capsule.JSONFRomCapsule()
+
 	if err != nil {
 		log.Error("capsule message failed to interpolate, err: %w", err)
+		//tod: error handling
+		return capsule
 	}
-	capsuleString := string(marshaledCapsule)
 
 	//convert route/path params to map
 	var pathParamsDictionary = convertPathParamsToMap(c)
@@ -88,11 +93,12 @@ func interpolateCapsuleValues(c echo.Context, capsule messages.Capsule) messages
 		log.Warning("capsule interpolation failed with err: %w", err)
 	}
 
-	var interpolatedCapsule messages.Capsule
-	err = json.Unmarshal([]byte(capsuleString), &interpolatedCapsule)
+	interpolatedCapsule, err := messages.CapsuleFromJSON(capsuleString)
 
 	if err != nil {
 		log.Warning("capsule message failed to Unmarshal, err: %w", err)
+		//todo: handle
+		return capsule
 	}
 	return interpolatedCapsule
 }
@@ -109,45 +115,21 @@ func convertPathParamsToMap(c echo.Context) map[string]string {
 }
 
 func DispatchCapsule(c echo.Context, ctx context.Context, capsule messages.Capsule) (messages.DefaultResponseMessage, error) {
-
-	//remove internal instruction and handle a message by its remote sub-type!!!!!
-	//checks for an internal instruction
-	if capsule.Route.Remote.Internal != nil {
-		directive := capsule.Route.Remote.Internal.Type
-		response := internal.Exec(capsule, directive)
-		m := messages.DefaultResponseMessage{
-			Error:     false,
-			Data:      response,
-			Selectors: capsule.Selectors,
-		}
-		return m, nil
-	}
-
-	if capsule.Route.Remote.Webhook != nil {
-		event := capsule.Route.Remote.Webhook.Event
-		response := webhooks.Exec(capsule, event)
-		m := messages.DefaultResponseMessage{
-			Error:     false,
-			Data:      response,
-			Selectors: capsule.Selectors,
-		}
-		return m, nil
-	}
-
-	//main message/action relay/execution
-	err := messaging.Get().Publish(ctx, capsule)
-
+	//todo: implement Sync behaviour
+	response, err := internal.ProcessCapsule(ctx, capsule)
 	if err != nil {
 		return messages.DefaultResponseMessage{
 			Error: true,
 		}, err
 	}
+	fmt.Println(response)
 
 	m := messages.DefaultResponseMessage{
 		Data:      HachiContext.PublishSuccessful,
 		Selectors: capsule.Selectors,
 	}
 	return m, nil
+
 }
 
 /*

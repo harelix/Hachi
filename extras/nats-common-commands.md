@@ -13,6 +13,7 @@ create stream + cli args
 ```bash
 nats stream add neurostream --subjects "cns.brain.>" --ack --max-msgs=-1 --max-bytes=-1 --max-age=1y --storage file --retention limits --max-msg-size=-1 --discard=old
 ```
+5 minutes please :)
 
 # Consumers
 
@@ -39,7 +40,10 @@ nats consumer next neurostream brain_consumer --count 1000
 ```
 
 ```bash
-nats pub neurostream --subject cns.brain.neurolink --count=10 --sleep 1s "publication #{{Count}} @ {{TimeStamp}}"
+#subject = neurostream.controller.to.agents
+#message =  Cheesus!
+nats pub "neurostream.controller.to.agents" "Cheesus!"
+#nats pub neurostream "cns.brain.neurolink --count=10 --sleep 1s "publication #{{Count}} @ {{TimeStamp}}"
 ```
 
 

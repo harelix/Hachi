@@ -1,0 +1,5 @@
+package selectors
+
+func GetAgentsForSelectors() {
+	
+}

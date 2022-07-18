@@ -1,17 +1,6 @@
 dna "internals" {
   tracts {
-    //static event from configuration
-    stream "webhook_registration_endpoint" {
-      async = true
-      verb = "POST"
-      selectors = []
-      local = "/webhooks/:client"
-      remote {
-        webhook {
-          event = "__internal__.webhook.register#endpoint"
-        }
-      }
-    }
+
 
     /*
     stream "edge_devices_registration" {
@@ -27,6 +16,19 @@ dna "internals" {
     }
     */
 
+
+    //static event from configuration
+    stream "webhook_registration_endpoint" {
+      async = true
+      verb = "POST"
+      selectors = []
+      local = "/webhooks/:client"
+      remote {
+        webhook {
+          event = "__internal__.webhook.register#endpoint"
+        }
+      }
+    }
     stream "encrypt" {
       async   = false
       selectors = []

@@ -33,7 +33,7 @@ ALTER TABLE IF EXISTS public.edge_registry
 
 
 INSERT INTO public.edge_registry(id, label, communication_channel, path)
-VALUES (uuid_ltree(), 'tom', 'stream.tom', array['root.edge.location.ramat_gan','root.edge.size.large']::ltree[]);
+VALUES (uuid_ltree(), 'controller', 'main.controller', array['root.owner']::ltree[]);
 
 /*SELECT * FROM edge_registry WHERE path ? ARRAY['*.*.location.*','*.*.transactions.large']::lquery[];*/
 
@@ -41,4 +41,5 @@ VALUES (uuid_ltree(), 'tom', 'stream.tom', array['root.edge.location.ramat_gan',
 SELECT * FROM edge_registry
          WHERE path ? ARRAY['*.location.*']::lquery[]
          AND path ? ARRAY['*.large']::lquery[]
-        OR path ? ARRAY['*.sale.nothing']::lquery[]
+         OR path ? ARRAY['*.sale.nothing']::lquery[]
+

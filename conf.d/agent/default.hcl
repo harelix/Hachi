@@ -9,10 +9,10 @@ dna "agent" {
 
   agent {
     //It is recommended to keep the maximum number of tokens in your subjects to a reasonable value of 16
-    enabled = false
+    enabled = true
     identifiers {
       core = ""
-      descriptors = []
+      descriptors = ["stations", "north", "galil" , "large", "happy", "mobile"]
     }
   }
 
@@ -71,5 +71,21 @@ dna "agent" {
   }
 
   #Drivers support interpreting node attributes and runtime environment
-  tracts {}
+  tracts {
+    stream "register" {
+      async = true
+      verb = "POST"
+      selectors = ["neurostream.controller.to.agents"]
+      local = "/cns/brain/:lobe/region/:region"
+      remote {
+        http {
+          url = "{{.remote::audio_device_addr}}/{{.local::audio_quality}}/sonant"
+        }
+      }
+      headers = {
+        "hachi-relay-x" = ["{{.remote::relay_service_addr}}", "{{.local::static_token}}"]
+        "hachi-token" = ["{{.local::static_token}}"]
+      }
+    }
+  }
 }

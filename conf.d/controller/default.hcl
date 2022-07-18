@@ -13,7 +13,7 @@ dna "controller" {
   }
 
   agent {
-    //It is recommended to keep the maximum number of tokens in your subjects to a reasonable value of 16
+    //it is recommended to keep the maximum number of tokens in your subjects to a reasonable value of 16
     enabled = false
   }
 
@@ -39,13 +39,17 @@ dna "controller" {
     }
   }
 
+
+  //todo: is this useless??
   storage {
-    data_dir  = ""
+    data_dir = ""
   }
 
+  //todo: are we using a kv store?
   kv_db {
     //https://github.com/dgraph-io/badger
   }
+
 
   hrl {
     crypto {
@@ -77,8 +81,8 @@ dna "controller" {
     stream "simple_async_result" {
       async = true
       verb = "POST"
-      selectors = ["stations.>.{{.route::type}}", "agent.internal.>"]
-      local = "/metrics/type/:type/filter/:filter"
+      selectors = ["{{.route::selector}}", "north"]
+      local = "/metrics/type/:type/selector/:selector"
       remote {
         http {
           url = "metrics_service.remote_server:8080/metrics/{{.route::type}}/{{.route::filter}}"

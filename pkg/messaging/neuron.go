@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"fmt"
+	"github.com/rills-ai/Hachi/pkg/exec"
 	"github.com/rills-ai/Hachi/pkg/messaging/consumers"
 	"strconv"
 	"strings"
@@ -167,27 +168,34 @@ type PublishedMessage struct {
 	Error   error
 }
 
+// handleIncomingMessage
 func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
-	message := pu.Message
+
+	message := pu.Message //NATS struct
+	//0%
 	if message == nil {
+		log.Info("Empty message recived on agent.")
+	}
+
+	capsule, err := messages.CapsuleFromJSON(string(message.Data))
+	if err != nil {
+		log.Error("Capsule could not be unmarshaled from JSON.")
+		//todo: handle?????
+		//call a specific nil message handler
 		return
 	}
-	fmt.Println(message.Data)
 
-	//Http Dispatch storix
-	/*tracing.Trace(tracing.HachiContext{
-		Method:      "",
-		Path:        "",
-		Resource:    "",
-		ServiceName: "",
-		ServiceType: "",
-	})*/
-	//invokeSink/Exec
+	/*
+		Processing of our incoming capsule
+	*/
+	exec.ProcessIncomingCapsule(capsule)
+
+	//todo: tracing
+	//invoke sink/Exec
 	e := message.Ack()
 	if e != nil {
 		println("bind default pull subscriber: %w", e)
 	}
-
 }
 
 /*
@@ -222,12 +230,12 @@ func (hn *HachiNeuron) Subscribe(subjects []string) error {
 	return nil
 }
 
-func (hn *HachiNeuron) Publish(ctx context.Context, capsule messages.Capsule) error {
+func (hn *HachiNeuron) Publish(ctx context.Context, capsule messages.Capsule, selectors []string) error {
 	msg, err := json.Marshal(capsule)
 	if err != nil {
 		return err
 	}
-	for _, subject := range capsule.Selectors {
+	for _, subject := range selectors {
 		err = hn.NC.Publish(subject, []byte(msg))
 		return err
 	}

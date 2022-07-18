@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/rills-ai/Hachi/pkg/integrity"
+	"github.com/rills-ai/Hachi/pkg/agent"
 	"os"
 	"os/signal"
 	"time"
@@ -29,7 +29,6 @@ func init() {
 
 func main() {
 	log.SetReportCaller(true)
-
 	go PrintHachiWelcome()
 
 	var confile = flag.String("config", "", "default configuration file path")
@@ -87,7 +86,10 @@ func SelfProvisioning(config *config.HachiConfig) {
 	if config.Service.DNA.Controller.Enabled {
 		//todo: maybe a constant identifier
 	} else {
-		config.Service.DNA.Agent.Identifiers.Core = integrity.ValidateAgentID()
+		err := agent.SelfProvision()
+		if err != nil {
+			log.Fatalf("%v, Invalid Identifier for Hachi agent. Initializing new ID after service restart sending notification.", err)
+		}
 	}
 }
 

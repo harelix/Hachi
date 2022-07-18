@@ -1,0 +1,243 @@
+# show a specific section of cheats
+nats cheat pub
+
+# list available sections
+nats cheat --sections
+
+# Save cheats to files in the format expected by 'cheats'
+rm -rf .config/cheat/cheatsheets/personal/nats
+nats cheat --save .config/cheat/cheatsheets/personal/nats
+cheat nats/sub
+
+# To publish 100 messages with a random body between 100 and 1000 characters
+nats pub destination.subject "{{ Random 100 1000 }}" -H Count:{{ Count }} --count 100
+
+# To publish messages from STDIN
+echo "hello world" | nats pub destination.subject
+
+# To request a response from a server and show just the raw result
+nats request destination.subject "hello world" -H "Content-type:text/plain" --raw
+
+# To set up a responder that runs an external command with the 3rd subject token as argument
+nats reply "service.requests.>" --command "service.sh {{2}}"
+
+# To set up basic responder
+nats reply service.requests "Message {{Count}} @ {{Time}}"
+nats reply service.requests --echo --sleep 10
+
+# To test latency between 2 servers
+nats latency --server srv1.example.net:4222 --server-b srv2.example.net:4222 --duration 10s
+
+# To see all available schemas using regular expressions
+nats schema search 'response|request'
+
+# To view a specific schema
+nats schema show io.nats.jetstream.api.v1.stream_msg_get_request --yaml
+
+# To validate a JSON input against a specific schema
+nats schema validate io.nats.jetstream.api.v1.stream_msg_get_request request.json
+
+# to create governor with 10 slots and 1 minute timeout
+nats governor add cron 10 1m
+
+# to view the configuration and state
+nats governor view cron
+
+# to reset the governor, clearing all slots
+nats governor reset cron
+
+# to run long-job.sh when a slot is available, giving up after 20 minutes without a slot
+nats governor run cron $(hostname -f) --max-wait 20m long-job.sh'
+
+# benchmark core nats publish and subscribe with 10 publishers and subscribers
+nats bench testsubject --pub 10 --sub 10 --msgs 10000 --size 512
+
+# benchmark core nats request/reply without subscribers using a queue
+nats bench testsubject --pub 1 --sub 1 --msgs 10000 --no-queue
+
+# benchmark core nats request/reply with queuing
+nats bench testsubject --sub 4 --reply
+nats bench testsubject --pub 4 --request --msgs 20000
+
+# benchmark JetStream synchronously acknowledged publishing purging the data first
+nats bench testsubject --js --syncpub --pub 10  --msgs 10000 --purge
+
+# benchmark JS publish and push consumers at the same time purging the data first
+nats bench testsubject --js --pub 4 --sub 4 --purge
+
+# benchmark JS stream purge and async batched publishing to the stream
+nats bench testsubject --js --pub 4 --purge
+
+# benchmark JS stream get replay from the stream using a push consumer
+nats bench testsubject --js --sub 4
+
+# benchmark JS stream get replay from the stream using a pull consumer
+nats bench testsubject --js --sub 4 --pull
+
+# remember when benchmarking JetStream
+Once you are finished benchmarking, remember to free up the resources (i.e. memory and files) consumed by the stream using 'nats stream rm'
+
+# Create or update
+nats context add development --server nats.dev.example.net:4222 [other standard connection properties]
+nats context add ngs --description "NGS Connection in Orders Account" --nsc nsc://acme/orders/new
+nats context edit development [standard connection properties]
+
+# View contexts
+nats context ls
+nats context show development --json
+
+# Validate all connections are valid and that connections can be established
+nats context validate --connect
+
+# Select a new default context
+nats context select
+
+# Connecting using a context
+nats pub --context development subject body
+
+# To look up information for error code 1000
+nats errors lookup 1000
+
+# To list all errors mentioning stream using regular expression matches
+nats errors list stream
+
+# As a NATS Server developer edit an existing code in errors.json
+nats errors edit errors.json 10013
+
+# As a NATS Server developer add a new code to the errors.json, auto picking a code 
+nats errors add errors.json 
+
+# To view common system events
+nats events
+nats events --short --all
+nats events --no-srv-advisory --js-metric --js-advisory
+nats events --no-srv-advisory --subjects service.latency.weather
+
+# to create a replicated KV bucket
+nats kv add CONFIG --replicas 3
+
+# to store a value in the bucket
+nats kv put CONFIG username bob
+
+# to read just the value with no additional details
+nats kv get CONFIG username --raw
+
+# view an audit trail for a key if history is kept
+nats kv history CONFIG username
+
+# to see the bucket status
+nats kv status CONFIG
+
+# observe real time changes for an entire bucket
+nats kv watch CONFIG
+# observe real time changes for all keys below users
+nats kv watch CONFIG 'users.>''
+
+# create a bucket backup for CONFIG into backups/CONFIG
+nats kv status CONFIG
+nats stream backup <stream name> backups/CONFIG
+
+# restore a bucket from a backup
+nats stream restore <stream name> backups/CONFIG
+
+# list known buckets
+nats kv ls
+
+# to create a replicated bucket
+nats obj add FILES --replicas 3
+
+# store a file in the bucket
+nats obj put FILES image.jpg
+
+# store contents of STDIN in the bucket
+cat x.jpg|nats obj put FILES --name image.jpg
+
+# retrieve a file from a bucket
+nats obj get FILES image.jpg -O out.jpg
+
+# delete a file
+nats obj rm FILES image.jpg
+
+# view bucket info
+nats obj info FILES
+
+# view file info
+nats obj info FILES image.jpg
+
+# list known buckets
+nats obj ls
+
+# view all files in a bucket
+nats obj ls FILES
+
+# prevent further modifications to the bucket
+nats obj seal FILES
+
+# create a bucket backup for FILES into backups/FILES
+nats obj status FILES
+nats stream backup <stream name> backups/FILES
+
+# restore a bucket from a backup
+nats stream restore <stream name> backups/FILES
+
+# To see all servers, including their server ID and show a response graph
+nats server ping --id --graph --user system
+
+# To see information about a specific server
+nats server info nats1.example.net --user system
+nats server info NCAXNST2VH7QGBVYBEDQGX73GMBXTWXACUTMQPTNKWLOYG2ES67NMX6M --user system
+
+# To list all servers and show basic summaries, expecting responses from 10 servers
+nats server list 10 --user system
+
+# To report on current connections
+nats server report connections 
+nats server report connz --account WEATHER
+nats server report connz --sort in-msgs
+nats server report connz --top 10 --sort in-msgs
+
+# To report on accounts
+nats server report accounts
+nats server report accounts --account WEATHER --sort in-msgs --top 10
+
+# To report on JetStream usage by account WEATHER
+nats server report jetstream --account WEATHER --sort cluster
+
+# To generate a NATS Server bcrypt command
+nats server password
+nats server pass -p 'W#OZwVN-UjMb8nszwvT2LQ'
+nats server pass -g
+PASSWORD='W#OZwVN-UjMb8nszwvT2LQ' nats server pass
+
+# To request raw monitoring data from servers
+nats server request subscriptions --detail --filter-account WEATHER --cluster EAST
+nats server req variables --name nats1.example.net
+nats server req connections --filter-state open
+nats server req connz --subscriptions --name nats1.example.net
+nats server req gateways --filter-name EAST
+nats server req leafnodes --subscriptions
+nats server req accounts --account WEATHER
+nats server req jsz --leader
+
+# To manage JetStream cluster RAFT membership
+nats server raft step-down
+
+# To subscribe to messages, in a queue group and acknowledge any JetStream ones
+nats sub source.subject --queue work --ack
+
+# To subscribe to a randomly generated inbox
+nats sub --inbox
+
+# To dump all messages to files, 1 file per message
+nats sub --inbox --dump /tmp/archive
+
+# To process all messages using xargs 1 message at a time through a shell command
+nats sub subject --dump=- | xargs -0 -n 1 -I "{}" sh -c "echo '{}' | wc -c"
+
+# To view account information and connection
+nats account info
+
+# To report connections for your command
+nats account report connections
+
+
