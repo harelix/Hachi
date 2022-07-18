@@ -57,6 +57,7 @@ func main() {
 	}
 
 	SelfProvisioning(config.New())
+
 	//config main service context
 	ctx, cancel := context.WithCancel(context.WithValue(context.Background(),
 		HachiContext.ContextIAM, config.New().IAM))
@@ -71,6 +72,10 @@ func main() {
 		cLog.Errorf("failed to init Hachi: %v", err)
 		os.Exit(1)
 	}
+
+	//verify agent validity and liveliness with Hachi's controller
+	agent.Verify()
+
 	//go messaging.Get().SubscribeDefault()
 	//messaging.Get().Subscribe(dendrite.GetSubscriptionSubjects(config.New()))
 	//NATS connection close
@@ -90,7 +95,6 @@ func SelfProvisioning(config *config.HachiConfig) {
 		if err != nil {
 			log.Fatalf("%v, Invalid Identifier for Hachi agent. Initializing new ID after service restart sending notification.", err)
 		}
-		agent.Verify()
 	}
 }
 

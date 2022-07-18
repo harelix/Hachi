@@ -33,6 +33,42 @@ func SelfProvision() error {
 }
 
 func Verify() error {
+	cfg := config.New()
+	if cfg.IAM.GetType() != config.Agent {
+		return nil
+	}
+	if cfg.Service.DNA.Agent.Verified {
+		return nil
+	}
+
+	agentCfg, _ := config.New().Service.DNA.Agent.ToJSON()
+
+	capsule := messages.Capsule{
+		Message:   agentCfg,
+		Headers:   nil,
+		Selectors: []string{HachiContext.AgentsNATSDefaultAfferentSubjects},
+		Route: &config.RouteConfig{
+			Async:     false,
+			Name:      "",
+			Selectors: nil,
+			Verb:      "",
+			Local:     "",
+			Remote: config.RemoteExecConfig{
+				HTTP:    nil,
+				SSH:     nil,
+				Webhook: nil,
+				Internal: &config.InternalConfig{
+					Type: HachiContext.RegisterAgentInternalCommand,
+				},
+			},
+			Headers:                    nil,
+			IndexedInterpolationValues: nil,
+			Payload:                    "",
+		},
+	}
+
+	messaging.Get().Publish(context.Background(), capsule, capsule.Selectors)
+
 	//todo: TOM-HA & RL
 	//1. Dispatch message to controller - here I AM! here's my ID and labels/selectors
 	//2. Controller -> save agent selectors and params (Postgres)
