@@ -38,4 +38,5 @@ func Verify() error {
 	//2. Controller -> save agent selectors and params (Postgres)
 	//3. Controller to Agent confirmation - you've been registered
 	//4. save verification / date to agent file
+	return nil
 }
