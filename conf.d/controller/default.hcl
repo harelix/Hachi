@@ -81,11 +81,11 @@ dna "controller" {
     stream "simple_async_result" {
       async = true
       verb = "POST"
-      selectors = ["{{.route::selector}}", "north"]
+      selectors = ["neurostream.controller.to.agents"]
       local = "/metrics/type/:type/selector/:selector"
       remote {
         http {
-          url = "metrics_service.remote_server:8080/metrics/{{.route::type}}/{{.route::filter}}"
+          url = "metrics_service.remote_server:8080/metrics/{{.route::type}}/{{.route::selector}}"
         }
       }
       headers = {
