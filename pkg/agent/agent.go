@@ -31,3 +31,7 @@ func SelfProvision() error {
 	log.Info("agent loaded from JSON, v%", config.New().Service.DNA.Agent.Identifiers.Core)
 	return nil
 }
+
+func Verify() error {
+	//todo: TOM-HA
+}

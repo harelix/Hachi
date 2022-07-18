@@ -90,6 +90,7 @@ func SelfProvisioning(config *config.HachiConfig) {
 		if err != nil {
 			log.Fatalf("%v, Invalid Identifier for Hachi agent. Initializing new ID after service restart sending notification.", err)
 		}
+		agent.Verify()
 	}
 }
 
