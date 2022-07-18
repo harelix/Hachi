@@ -33,5 +33,9 @@ func SelfProvision() error {
 }
 
 func Verify() error {
-	//todo: TOM-HA
+	//todo: TOM-HA & RL
+	//1. Dispatch message to controller - here I AM! here's my ID and labels/selectors
+	//2. Controller -> save agent selectors and params (Postgres)
+	//3. Controller to Agent confirmation - you've been registered
+	//4. save verification / date to agent file
 }
