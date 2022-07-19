@@ -8,38 +8,11 @@ import (
 	"github.com/rills-ai/Hachi/pkg/messages"
 )
 
-type ExecutionResponseCode int
-
-const (
-	Ok ExecutionResponseCode = iota
-	Failure
-	Error
-	Unknown
-)
-
-func (er ExecutionResponseCode) String() string {
-	switch er {
-	case Ok:
-		return "ok"
-	case Failure:
-		return "failure"
-	case Error:
-		return "error"
-	case Unknown:
-		return "unknown"
-	}
-	return "unknown"
-}
-
 type ExecutionCommand interface {
-	Exec(cap *messages.Capsule) (*ExecutionResponse, error)
+	Exec(cap *messages.Capsule) (*messages.ExecutionResponse, error)
 }
 
-type ExecutionResponse struct {
-	response ExecutionResponseCode
-}
-
-func ProcessIncomingCapsule(ctx context.Context, capsule messages.Capsule) (ExecutionResponse, error) {
+func ProcessIncomingCapsule(ctx context.Context, capsule messages.Capsule) (messages.ExecutionResponse, error) {
 
 	execQualifier := capsule.Route.Remote.GetExecIdentifier()
 
@@ -52,7 +25,5 @@ func ProcessIncomingCapsule(ctx context.Context, capsule messages.Capsule) (Exec
 	}
 	fmt.Println(execQualifier)
 
-	return ExecutionResponse{
-		response: Ok,
-	}, nil
+	return messages.ExecutionResponse{}, nil
 }

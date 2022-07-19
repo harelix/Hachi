@@ -119,7 +119,8 @@ func internals(capsule messages.Capsule, directive string) messages.InternalResp
 	}
 }
 
-func registerAgent(capsule messages.Capsule) {
+/*registerAgent - controller only (for now) method*/
+func registerAgent(capsule messages.Capsule) (messages.ExecutionResponse, error) {
 
 	agent, err := config.AgentConfigFromJSON(capsule.Message)
 	if err != nil {
@@ -131,9 +132,9 @@ func registerAgent(capsule messages.Capsule) {
 		selectors.BuildAgentDedicatedChannelIdentifier(agentId))
 
 	if err != nil {
-		//todo:
+		return messages.ExecutionResponse{}, err
 	}
-
 	fmt.Println(success)
 	fmt.Println(agentId)
+	return messages.ExecutionResponse{}, nil
 }

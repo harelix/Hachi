@@ -20,6 +20,9 @@ const DAT_FILE = "data/__id.dat"
 //todo: hide our token :)
 const AUTHENTICITY_TOKEN string = "Hachi::"
 
+func GenerateAgentID() string {
+	return AUTHENTICITY_TOKEN + "rlx" + strings.Replace(uuid.New().String(), "-", "", -1) + ":" + strconv.FormatInt(time.Now().Unix(), 10)
+}
 func ProvisionAgent(agentConf config.AgentConfig) string {
 
 	id := ""
@@ -33,7 +36,7 @@ func ProvisionAgent(agentConf config.AgentConfig) string {
 	}
 
 	if agentConf.Identifiers.Core == "" {
-		id = AUTHENTICITY_TOKEN + "rlx" + strings.Replace(uuid.New().String(), "-", "", -1) + ":" + strconv.FormatInt(time.Now().Unix(), 10)
+		id = GenerateAgentID()
 	}
 
 	agentConf.Identifiers.Core = id
