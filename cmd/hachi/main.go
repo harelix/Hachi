@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/rills-ai/Hachi/pkg/agent"
+	"github.com/rills-ai/Hachi/pkg/core"
 	"os"
 	"os/signal"
 	"time"
@@ -70,10 +71,15 @@ func main() {
 
 	/*-==[ Init Hachi Neuron ]==-*/
 	err = messaging.Get().Init(ctx)
+
 	if err != nil {
 		cLog.Errorf("failed to init Hachi: %v", err)
 		os.Exit(1)
 	}
+
+	go func() {
+		core.ProcessIncomingCapsule(nil, <-messaging.Get().OnMessageChannel)
+	}()
 
 	/*-== Verify agent validity and liveliness with Hachi's main controller ==-*/
 	agent.Verify()

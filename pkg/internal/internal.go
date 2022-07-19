@@ -3,8 +3,10 @@ package internal
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	HachiContext "github.com/rills-ai/Hachi/pkg"
 	"github.com/rills-ai/Hachi/pkg/agent"
+
 	"github.com/rills-ai/Hachi/pkg/config"
 	"github.com/rills-ai/Hachi/pkg/controller"
 	"github.com/rills-ai/Hachi/pkg/cryptography"
@@ -13,11 +15,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"strings"
 )
-
-type InternalResponse struct {
-	Result    string
-	Directive string
-}
 
 func ProcessCapsule(ctx context.Context, capsule messages.Capsule) (messages.DefaultResponseMessage, error) {
 
@@ -83,15 +80,21 @@ func DispatchCapsuleToMessageQueueSubscribers(ctx context.Context, capsule messa
 	return messages.DefaultResponseMessage{}, nil
 }
 
-func internals(capsule messages.Capsule, directive string) InternalResponse {
+func internals(capsule messages.Capsule, directive string) messages.InternalResponse {
 	args := strings.Split(directive, "#")
 
 	switch args[0] {
+	case HachiContext.RegisterAgentInternalCommand:
+		registerAgent(capsule)
+		return messages.InternalResponse{
+			Result:    base64.StdEncoding.EncodeToString([]byte("")),
+			Directive: directive,
+		}
 	case HachiContext.InternalsCryptoEncrypt:
 
 		message := cryptography.Encryption(capsule.Message)
 
-		return InternalResponse{
+		return messages.InternalResponse{
 			Result:    base64.StdEncoding.EncodeToString([]byte(message)),
 			Directive: directive,
 		}
@@ -101,13 +104,22 @@ func internals(capsule messages.Capsule, directive string) InternalResponse {
 			//todo: report this one
 		}
 		message := cryptography.Decryption(string(decodedMessage))
-		return InternalResponse{
+		return messages.InternalResponse{
 			Result:    message,
 			Directive: directive,
 		}
 	default:
-		return InternalResponse{
+		return messages.InternalResponse{
 			Result: "NoActTak",
 		}
 	}
+}
+
+func registerAgent(capsule messages.Capsule) {
+	agent, err := config.AgentConfigFromJSON(capsule.Message)
+	if err != nil {
+		log.Error("agent verification unmarshling failed")
+	}
+	agentId := agent.Identifiers.Core
+	fmt.Println(agentId)
 }

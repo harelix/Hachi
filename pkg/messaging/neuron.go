@@ -2,7 +2,6 @@ package messaging
 
 import (
 	"fmt"
-	"github.com/rills-ai/Hachi/pkg/core"
 	"github.com/rills-ai/Hachi/pkg/messaging/consumers"
 	"strconv"
 	"strings"
@@ -28,6 +27,7 @@ type HachiNeuron struct {
 	Agent                config.IAgent
 	DefaultNATSRegisters map[string]DefaultNATSRegister
 	bufferSize           int
+	OnMessageChannel     chan messages.Capsule
 }
 
 func (hn *HachiNeuron) GetBufferSize() int {
@@ -94,6 +94,10 @@ func (hn *HachiNeuron) Connect(ctx context.Context, retry int) error {
 		"agent_type": config.New().IAM.GetType(),
 		"NATS_addr":  config.New().Service.DNA.Nats.Address,
 	}).Info("successfully connected to NATS server.")
+
+	//-== create external consumers channel ==-
+	hn.OnMessageChannel = make(chan messages.Capsule)
+
 	//Provision our Default JETStream Consumers and Handlers
 	//======================================================
 	hn.ProvisionNATSJetStream()
@@ -189,7 +193,7 @@ func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
 	/*
 		Processing of our incoming capsule
 	*/
-	core.ProcessIncomingCapsule(context.Background(), capsule)
+	hn.OnMessage(capsule)
 
 	//todo: tracing
 	//invoke sink/Exec
@@ -197,6 +201,10 @@ func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
 	if e != nil {
 		println("bind default pull subscriber: %w", e)
 	}
+}
+
+func (hn *HachiNeuron) OnMessage(capsule messages.Capsule) {
+	hn.OnMessageChannel <- capsule
 }
 
 func (hn *HachiNeuron) Subscribe(subjects []string) error {
