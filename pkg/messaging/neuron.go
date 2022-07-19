@@ -2,7 +2,7 @@ package messaging
 
 import (
 	"fmt"
-	"github.com/rills-ai/Hachi/pkg/exec"
+	"github.com/rills-ai/Hachi/pkg/core"
 	"github.com/rills-ai/Hachi/pkg/messaging/consumers"
 	"strconv"
 	"strings"
@@ -189,7 +189,7 @@ func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
 	/*
 		Processing of our incoming capsule
 	*/
-	exec.ProcessIncomingCapsule(capsule)
+	core.ProcessIncomingCapsule(context.Background(), capsule)
 
 	//todo: tracing
 	//invoke sink/Exec
@@ -198,28 +198,6 @@ func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
 		println("bind default pull subscriber: %w", e)
 	}
 }
-
-/*
-!!!!!!!!!!!! DO NOT DELETE THIS ONE !!!!!!!!!!!!!!!!!!
-func (hn *HachiNeuron) SubscribeDefault(){
-	subscriber, err := hn.JS.PullSubscribe(HachiContext.NATSDefaultSubjects, HachiContext.NATSDefaultStreamConsumerName,
-		nats.PullMaxWaiting(512))
-	noerr(err)
-
-	for {
-		cMessages, _ := subscriber.Fetch(10)
-		for _, cMsg := range cMessages {
-			err := cMsg.Ack()
-			noerr(err)
-			if err != nil {
-				log.Fatal(err)
-			}
-			log.Println(cMsg.Data) //exec router
-			log.Println("execution-command recived")
-		}
-	}
-}
-*/
 
 func (hn *HachiNeuron) Subscribe(subjects []string) error {
 	for _, subject := range subjects {
@@ -246,3 +224,25 @@ func (hn *HachiNeuron) Publish(ctx context.Context, capsule messages.Capsule, se
 func (hn *HachiNeuron) Close() {
 	hn.NC.Close()
 }
+
+/*
+!!!!!!!!!!!! DO NOT DELETE THIS ONE !!!!!!!!!!!!!!!!!!
+func (hn *HachiNeuron) SubscribeDefault(){
+	subscriber, err := hn.JS.PullSubscribe(HachiContext.NATSDefaultSubjects, HachiContext.NATSDefaultStreamConsumerName,
+		nats.PullMaxWaiting(512))
+	noerr(err)
+
+	for {
+		cMessages, _ := subscriber.Fetch(10)
+		for _, cMsg := range cMessages {
+			err := cMsg.Ack()
+			noerr(err)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Println(cMsg.Data) //external router
+			log.Println("execution-command recived")
+		}
+	}
+}
+*/

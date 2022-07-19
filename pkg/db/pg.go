@@ -14,7 +14,7 @@ const (
 	port     = 5432
 	user     = "postgres"
 	password = "hachi"
-	dbname   = "hachi"
+	dbname   = "postgres"
 )
 
 func BuildConnectionString() string {

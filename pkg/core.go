@@ -1,7 +1,9 @@
-package exec
+package HachiContext
 
 import (
 	"fmt"
+	"github.com/rills-ai/Hachi/pkg/config"
+	"github.com/rills-ai/Hachi/pkg/internal"
 	"github.com/rills-ai/Hachi/pkg/messages"
 )
 
@@ -36,9 +38,22 @@ type ExecutionResponse struct {
 	response ExecutionResponseCode
 }
 
-func ProcessIncomingCapsule(capsule messages.Capsule) (ExecutionResponse, error) {
-	fmt.Println(capsule)
-	//capsule.Route.Remote.GetExecIdentifier()
+func ProcessIncomingCapsule(ctx context.Context, capsule messages.Capsule) (ExecutionResponse, error) {
+
+	execQualifier := capsule.Route.Remote.GetExecIdentifier()
+	fmt.Println(execQualifier)
+	fmt.Println(config.Internal)
+	fmt.Println(internal.InternalResponse{})
+	/*
+		switch execQualifier {
+		case config.Internal:
+			_, err := internal.ProcessCapsule(ctx, capsule)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+		fmt.Println(execQualifier)
+	*/
 	return ExecutionResponse{
 		response: Ok,
 	}, nil

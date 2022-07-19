@@ -12,7 +12,7 @@ dna "agent" {
     enabled = true
     identifiers {
       core = ""
-      descriptors = ["stations", "north", "galil" , "large", "happy", "mobile"]
+      descriptors = []
     }
   }
 

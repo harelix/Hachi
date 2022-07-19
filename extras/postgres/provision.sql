@@ -3,6 +3,9 @@ CREATE DATABASE db_hachi;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS ltree;
 
+
+
+
 CREATE FUNCTION uuid_ltree() RETURNS uuid
 AS 'SELECT md5(random()::text || clock_timestamp()::text)::uuid'
 LANGUAGE SQL
@@ -43,3 +46,20 @@ SELECT * FROM edge_registry
          AND path ? ARRAY['*.large']::lquery[]
          OR path ? ARRAY['*.sale.nothing']::lquery[]
 
+
+
+
+INSERT INTO public.edge_agents_annotations (
+    id, communication_channel, path)
+VALUES ('691f4a0b-d167-1428-7ba9-0b43b30640dd','agents.691f4a0bd16714287ba90b43b30640dd', array['agents', 'agents.691f4a0bd16714287ba90b43b30640dd']::ltree[]);
+
+
+
+SELECT * FROM public.edge_agents_annotations WHERE path ? ARRAY['agents.*']::lquery[]
+
+
+
+SELECT * FROM edge_registry
+WHERE path ? ARRAY['*.location.*']::lquery[]
+    AND path ? ARRAY['*.large']::lquery[]
+   OR path ? ARRAY['*.sale.nothing']::lquery[]

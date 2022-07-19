@@ -41,10 +41,31 @@ func Verify() error {
 		return nil
 	}
 
-	agentCfg, _ := config.New().Service.DNA.Agent.ToJSON()
+	capsule, err := BuildVerificationCapsuleForAgent()
+	if err != nil {
+		return err
+	}
 
-	capsule := messages.Capsule{
-		Message:   agentCfg,
+	messaging.Get().Publish(context.Background(), capsule, capsule.Selectors)
+
+	//todo: TOM-HA & RL
+	//1. Dispatch message to controller - here I AM! here's my ID and labels/selectors
+	//2. Controller -> save agent selectors and params (Postgres)
+	//3. Controller to Agent confirmation - you've been registered
+	//4. save verification / date to agent file
+	return nil
+}
+
+func BuildVerificationCapsuleForAgent() (messages.Capsule, error) {
+
+	agentVerificationJSON, err := config.New().Service.DNA.Agent.ToJSON()
+	if err != nil {
+		log.Error("agent config/verification values marshaling failed.")
+		return messages.Capsule{}, err
+	}
+
+	return messages.Capsule{
+		Message:   agentVerificationJSON,
 		Headers:   nil,
 		Selectors: []string{HachiContext.AgentsNATSDefaultAfferentSubjects},
 		Route: &config.RouteConfig{
@@ -65,14 +86,5 @@ func Verify() error {
 			IndexedInterpolationValues: nil,
 			Payload:                    "",
 		},
-	}
-
-	messaging.Get().Publish(context.Background(), capsule, capsule.Selectors)
-
-	//todo: TOM-HA & RL
-	//1. Dispatch message to controller - here I AM! here's my ID and labels/selectors
-	//2. Controller -> save agent selectors and params (Postgres)
-	//3. Controller to Agent confirmation - you've been registered
-	//4. save verification / date to agent file
-	return nil
+	}, nil
 }
