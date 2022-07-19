@@ -6,10 +6,11 @@ import (
 	"fmt"
 	HachiContext "github.com/rills-ai/Hachi/pkg"
 	"github.com/rills-ai/Hachi/pkg/agent"
-
 	"github.com/rills-ai/Hachi/pkg/config"
 	"github.com/rills-ai/Hachi/pkg/controller"
 	"github.com/rills-ai/Hachi/pkg/cryptography"
+	"github.com/rills-ai/Hachi/pkg/db"
+	"github.com/rills-ai/Hachi/pkg/internal/selectors"
 	"github.com/rills-ai/Hachi/pkg/messages"
 	"github.com/rills-ai/Hachi/pkg/webhooks"
 	log "github.com/sirupsen/logrus"
@@ -85,11 +86,14 @@ func internals(capsule messages.Capsule, directive string) messages.InternalResp
 
 	switch args[0] {
 	case HachiContext.RegisterAgentInternalCommand:
+
 		registerAgent(capsule)
+
 		return messages.InternalResponse{
 			Result:    base64.StdEncoding.EncodeToString([]byte("")),
 			Directive: directive,
 		}
+
 	case HachiContext.InternalsCryptoEncrypt:
 
 		message := cryptography.Encryption(capsule.Message)
@@ -116,10 +120,20 @@ func internals(capsule messages.Capsule, directive string) messages.InternalResp
 }
 
 func registerAgent(capsule messages.Capsule) {
+
 	agent, err := config.AgentConfigFromJSON(capsule.Message)
 	if err != nil {
 		log.Error("agent verification unmarshling failed")
 	}
 	agentId := agent.Identifiers.Core
+
+	success, err := db.GetInstance().RegisterAgent(agentId,
+		selectors.BuildAgentDedicatedChannelIdentifier(agentId))
+
+	if err != nil {
+		//todo:
+	}
+
+	fmt.Println(success)
 	fmt.Println(agentId)
 }

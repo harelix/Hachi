@@ -109,6 +109,12 @@ func (client *PostgresProvider) ExecuteServerQuery(connectionString string, quer
 	return raw_message
 }
 
+func (client *PostgresProvider) RegisterAgent(agentID string, dedicatedChannel string) (bool, error) {
+	fmt.Println(agentID)
+	fmt.Println(dedicatedChannel)
+	return true, nil
+}
+
 /*
 func (client *PostgresProvider) WriteRawIncomingMessage(channel string, capsule runners.MessageCapsule) {
 
