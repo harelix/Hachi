@@ -175,6 +175,7 @@ func (hn *HachiNeuron) handleIncomingMessage(pu *PublishedMessage) {
 	//0%
 	if message == nil {
 		log.Info("Empty message recived on agent.")
+		return
 	}
 
 	capsule, err := messages.CapsuleFromJSON(string(message.Data))

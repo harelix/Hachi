@@ -1,22 +1,18 @@
 dna "internals" {
   tracts {
-
-
     /*
     stream "edge_devices_registration" {
-      async   = false
-      subject = ["__internal__.selectors.ed#ed"]
+      async   = true
+      subject = []
       verb    = "POST"
-      local   = "/hrl/edge_devices_registration"
+      local   = "/agent/register"
       remote {
         internal {
-          directive = "encrypt"
+          directive = "__internal__.agent.actions#register"
         }
       }
     }
-    */
-
-
+  */
     //static event from configuration
     stream "webhook_registration_endpoint" {
       async = true
