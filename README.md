@@ -1,5 +1,5 @@
 <h1>
-  <img src="https://coraza.io/images/logo_shield_only.png" align="left" height="46px" alt=""/>&nbsp;
+  <img src="https://github.com/harelix/Hachi/blob/agent_activation/extras/images/hachi_l.jpg?raw=true" align="left" height="46px" alt=""/>&nbsp;
   <span>Hachi - Cloud Native polymorphic connectivity mesh</span>
 </h1>
 
