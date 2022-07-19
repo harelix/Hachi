@@ -28,6 +28,7 @@ func init() {
 }
 
 func main() {
+
 	log.SetReportCaller(true)
 	go PrintHachiWelcome()
 
@@ -43,7 +44,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	//init config file
+	/*-==[ init config file ]==-*/
 	err := config.New().LoadStanzaValues(*valfile)
 	if err != nil {
 		log.Printf(err.Error())
@@ -56,24 +57,25 @@ func main() {
 		os.Exit(1)
 	}
 
+	/*-==[ Provision new agent ]==-**/
 	SelfProvisioning(config.New())
 
-	//config main service context
+	/*-==[ config main service context ]==-*/
 	ctx, cancel := context.WithCancel(context.WithValue(context.Background(),
 		HachiContext.ContextIAM, config.New().IAM))
 	defer cancel()
 
-	//bootstrap server
+	/*-==[ Bootstrap server ]==-*/
 	go api.StartAPIServer(ctx)
 
-	//init Hachi Neuron
+	/*-==[ Init Hachi Neuron ]==-*/
 	err = messaging.Get().Init(ctx)
 	if err != nil {
 		cLog.Errorf("failed to init Hachi: %v", err)
 		os.Exit(1)
 	}
 
-	//verify agent validity and liveliness with Hachi's controller
+	/*-== Verify agent validity and liveliness with Hachi's main controller ==-*/
 	agent.Verify()
 
 	//go messaging.Get().SubscribeDefault()
@@ -88,6 +90,7 @@ func main() {
 }
 
 func SelfProvisioning(config *config.HachiConfig) {
+
 	if config.Service.DNA.Controller.Enabled {
 		//todo: maybe a constant identifier
 	} else {
